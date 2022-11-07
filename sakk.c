@@ -11,75 +11,42 @@ typedef struct {
      char szin; //fehér = w, fekete = b
 } Mezo;
 
-// /*
-//      ez a metódus hozza létre a 8x8-as táblát, ennek a táblának fogjuk az értékeit állítani,
-//      amikor lépnek a játékosok
-// */
-// Mezo* sakktablaletrehozasa() {
-//      Mezo tabla[7][7];
-//      //tábla feltöltése
-//      for(int i = 0; i < 7; ++i) {
-//           for(int j = 0; j < 7; ++j) {
-//                tabla[i][j].x = i;
-//                tabla[i][j].y = j;
-//                //a paraszt bábuk beállítása
-//                if (i == 1) {
-//                     tabla[i][j].babu = 'p';
-//                     tabla[i][j].szin = 'b';
-//                }
-//                if (i == 6) {
-//                     tabla[i][j].babu = 'p';
-//                     tabla[i][j].szin = 'w';
-//                }
-//           }
-//      }
+char babubetuk[] = { 'k', 'q', 'r', 'b', 'h', 'p' };
 
-//      //fekete bábuk beállítása, a parasztokon kívül
-//      tabla[0][0].babu = 'r';
-//      tabla[0][1].babu = 'h';
-//      tabla[0][2].babu = 'b';
-//      tabla[0][3].babu = 'q';
-//      tabla[0][4].babu = 'k';
-//      tabla[0][5].babu = 'b';
-//      tabla[0][6].babu = 'h';
-//      tabla[0][7].babu = 'r';
+//ebben a karakter tömbben definiáljuk a bábukat
+char *babuk[] = { "♔", "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜", "♝", "♞", "♟︎" };
 
-//      tabla[0][0].szin = 'b';
-//      tabla[0][1].szin = 'b';
-//      tabla[0][2].szin = 'b';
-//      tabla[0][3].szin = 'b';
-//      tabla[0][4].szin = 'b';
-//      tabla[0][5].szin = 'b';
-//      tabla[0][6].szin = 'b';
-//      tabla[0][7].szin = 'b';
 
-//      //fehér bábuk beállítása, a parasztokon kívül
-//      tabla[7][0].babu = 'r';
-//      tabla[7][1].babu = 'h';
-//      tabla[7][2].babu = 'b';
-//      tabla[7][3].babu = 'k';
-//      tabla[7][4].babu = 'q';
-//      tabla[7][5].babu = 'b';
-//      tabla[7][6].babu = 'h';
-//      tabla[7][7].babu = 'r';
-
-//      tabla[7][0].szin = 'w';
-//      tabla[7][1].szin = 'w';
-//      tabla[7][2].szin = 'w';
-//      tabla[7][3].szin = 'w';
-//      tabla[7][4].szin = 'w';
-//      tabla[7][5].szin = 'w';
-//      tabla[7][6].szin = 'w';
-//      tabla[7][7].szin = 'w';
-// }
+//ez a metódus kiírja az aktuális táblát és a navigációkat
+void aktualismegjelenit(Mezo* m) {
+     printf("\n    a   b   c   d   e   f   g   h\n");
+     int szamol = 0;
+     for(int i = 0; i < 17; i++) {
+          if (i % 2 == 0) {
+               printf("  ");
+               for (int i = 0; i < 8; i++) {
+                    printf("+---");
+               }
+               printf("+");
+          } else {
+               printf("%d |", 8 - szamol);
+               for(int j = 0; j < 8; j++) {
+                    printf(" %c |", m->babu);
+                    m++;
+               }
+               szamol++;
+          }
+          printf("\n");
+     }
+}
 
 /*
      betölt egy sakktáblát, innen kezdődik a játék
 */
-void ujjatek(int* navigal) {
+void ujjatek(int* navigal) { 
      system("cls");
      printf("- Sakk -\n\n1. Uj jatek\n2. Jatek mentese\n3. Visszalepes\n\n9. Kilepes\n\n");
-     
+    
      Mezo tabla[8][8];
      //tábla feltöltése
      for(int i = 0; i < 8; i++) {
@@ -112,15 +79,6 @@ void ujjatek(int* navigal) {
      tabla[0][6].babu = 'h';
      tabla[0][7].babu = 'r';
 
-     tabla[0][0].szin = 'b';
-     tabla[0][1].szin = 'b';
-     tabla[0][2].szin = 'b';
-     tabla[0][3].szin = 'b';
-     tabla[0][4].szin = 'b';
-     tabla[0][5].szin = 'b';
-     tabla[0][6].szin = 'b';
-     tabla[0][7].szin = 'b';
-
      //fehér bábuk beállítása, a parasztokon kívül
      tabla[7][0].babu = 'r';
      tabla[7][1].babu = 'h';
@@ -131,21 +89,12 @@ void ujjatek(int* navigal) {
      tabla[7][6].babu = 'h';
      tabla[7][7].babu = 'r';
 
-     tabla[7][0].szin = 'w';
-     tabla[7][1].szin = 'w';
-     tabla[7][2].szin = 'w';
-     tabla[7][3].szin = 'w';
-     tabla[7][4].szin = 'w';
-     tabla[7][5].szin = 'w';
-     tabla[7][6].szin = 'w';
-     tabla[7][7].szin = 'w';
-     
      for(int i = 0; i < 8; i++) {
-          for(int j = 0; j < 8; j++) {
-               printf("%c ", tabla[i][j].babu);
-          }
-          printf("\n");
+          tabla[0][i].szin = 'b';
+          tabla[7][i].szin = 'w';
      }
+     
+     aktualismegjelenit(&tabla[0][0]);
 }
 
 /*
