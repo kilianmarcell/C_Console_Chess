@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "debugmalloc.h"
 
+void menu(int* navigal);
+void hibauzenet(char *uzenet);
+
 /*
      itt adom meg, hogy milyen tulajdonságai vannak egy mezőnek
 */
@@ -11,15 +14,25 @@ typedef struct {
      char szin; //fehér = w, fekete = b
 } Mezo;
 
+//a sakktábla oszlopait tárolja a karaktertömb
+char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+
+//a sakkbábuk betűit tárolja a karaktertömb
 char babubetuk[] = { 'k', 'q', 'r', 'b', 'h', 'p' };
 
-//ebben a karakter tömbben definiáljuk a bábukat
+//a sakkbábukat tárolja el a "karaktertömb"
 char *babuk[] = { "♔", "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜", "♝", "♞", "♟︎" };
 
 
 //ez a metódus kiírja az aktuális táblát és a navigációkat
 void aktualismegjelenit(Mezo* m) {
-     printf("\n    a   b   c   d   e   f   g   h\n");
+     system("cls");
+     printf("\n    ");
+     for (int i = 0; i < 8; i++) {
+          printf("%c   ", oszlopok[i]);
+     }
+     printf("\n");
+     
      int szamol = 0;
      for(int i = 0; i < 17; i++) {
           if (i % 2 == 0) {
@@ -38,15 +51,31 @@ void aktualismegjelenit(Mezo* m) {
           }
           printf("\n");
      }
+     printf("\n1. Jatek mentese\n2. Visszalepes\n\n9. Kilepes\n\n");
+}
+
+//ellenőrzi, hogy érvényes sorokat adott-e meg a felhasználó (sakk játszma közben)
+int helyesxy(int* x, int* y) {
+     return (*x >= 1 && *x <= 8 && *y >= 1 && *y <= 8);
+}
+
+//ellenőrzi, hogy érvényes oszlopokat adott-e meg a felhasználó (sakk játszma közben)
+int helyessoroszlop(char* sor, char* oszlop) {
+     *sor = tolower(*sor);
+     *oszlop = tolower(*oszlop);
+     int szamol = 0;
+     for(int i = 0; i < 8; i++) {
+          if (oszlopok[i] == *oszlop) ++szamol;
+          if (oszlopok[i] == *sor) ++szamol;
+     }
+
+     return (szamol == 2);
 }
 
 /*
      betölt egy sakktáblát, innen kezdődik a játék
 */
-void ujjatek(int* navigal) { 
-     system("cls");
-     printf("- Sakk -\n\n1. Uj jatek\n2. Jatek mentese\n3. Visszalepes\n\n9. Kilepes\n\n");
-    
+void ujjatek() {
      Mezo tabla[8][8];
      //tábla feltöltése
      for(int i = 0; i < 8; i++) {
@@ -95,6 +124,31 @@ void ujjatek(int* navigal) {
      }
      
      aktualismegjelenit(&tabla[0][0]);
+     
+     int muvelet;
+     char bemenet[5];
+     int x;
+     char sor;
+     int y;
+     char oszlop;
+
+     gets(bemenet);
+     do {
+          printf("\nBemenet: ");
+          gets(bemenet);
+          if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
+               //printf("\nSiker1 %c%d %c%d\n", sor, x, oszlop, y);
+               if (helyesxy(&x, &y) && helyessoroszlop(&sor, &oszlop)) {
+                    printf("Tru\n");
+               } else {
+                    hibauzenet("bemeneti erteket");
+               }
+          } else if (sscanf(bemenet, "%d", &muvelet) == 1) {
+               //printf("\nSiker2 %d\n", muvelet);
+          } else {
+               hibauzenet("bemeneti erteket");
+          }
+     } while(muvelet != 9);
 }
 
 /*
@@ -159,7 +213,7 @@ void menu(int* navigal) {
      switch (*navigal) {
           case 1:
                system("cls");
-               ujjatek(navigal);
+               ujjatek();
                break;
           case 2:
                system("cls");
