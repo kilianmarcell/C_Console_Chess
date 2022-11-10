@@ -4,9 +4,7 @@
 void menu(int* navigal);
 void hibauzenet(char *uzenet);
 
-/*
-     itt adom meg, hogy milyen tulajdonságai vannak egy mezőnek
-*/
+//itt adom meg, hogy milyen tulajdonságai vannak egy mezőnek
 typedef struct {
      int x; //sor
      int y; //oszlop
@@ -26,7 +24,7 @@ char *babuk[] = { "♔", "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜",
 
 //ez a metódus kiírja az aktuális táblát és a navigációkat
 void aktualismegjelenit(Mezo* m) {
-     system("cls");
+     //system("cls");
      printf("\n    ");
      for (int i = 0; i < 8; i++) {
           printf("%c   ", oszlopok[i]);
@@ -72,9 +70,38 @@ int helyessoroszlop(char* sor, char* oszlop) {
      return (szamol == 2);
 }
 
-/*
-     betölt egy sakktáblát, innen kezdődik a játék
-*/
+//a játékos által megadott betűt egy y koordinátává változtatja
+int betubolszamrakonvertal(char* betu) {
+     int szamol = 0;
+     for(int i = 0; i < 8; i++) {
+          if (oszlopok[i] == *betu) return (i);
+     }
+
+     return 0;
+}
+
+//kettő mezőt megcserél
+int poziciocserel(Mezo* honnan, Mezo* hova, char szin) {
+     if (honnan->babu != '-' && honnan->szin == szin) {
+          int x = honnan->x, y = honnan->y;
+          char babu = honnan->babu, szin = honnan->szin;
+
+          honnan->x = hova->x;
+          honnan->y = hova->y;
+          honnan->babu = hova->babu;
+          honnan->szin = hova->szin;
+
+          hova->x = x;
+          hova->y = y;
+          hova->babu = babu;
+          hova->szin = szin;
+          return 1;
+     }
+     
+     return 0;
+}
+
+//betölt egy sakktáblát, innen kezdődik a játék
 void ujjatek() {
      Mezo tabla[8][8];
      //tábla feltöltése
@@ -123,43 +150,49 @@ void ujjatek() {
           tabla[7][i].szin = 'w';
      }
      
-     aktualismegjelenit(&tabla[0][0]);
-     
-     int muvelet;
+     int muvelet, x, y;
+     char sor, oszlop, jatekos = 'w';
      char bemenet[5];
-     int x;
-     char sor;
-     int y;
-     char oszlop;
 
      gets(bemenet);
+     aktualismegjelenit(&tabla[0][0]);
      do {
-          printf("\nBemenet: ");
+          (jatekos == 'w') ? printf("Feher") : printf("Fekete");
+          printf(" jatekos: ");
           gets(bemenet);
           if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
-               //printf("\nSiker1 %c%d %c%d\n", sor, x, oszlop, y);
                if (helyesxy(&x, &y) && helyessoroszlop(&sor, &oszlop)) {
-                    printf("Tru\n");
+                    if (poziciocserel(&tabla[7 - (x - 1)][betubolszamrakonvertal(&sor)],
+                         &tabla[7 - (y - 1)][betubolszamrakonvertal(&oszlop)],
+                         jatekos) == 0) {
+                              if (jatekos == 'w') {
+                                   printf("A feher jatekos kovetkezik!\n");
+                              } else if (jatekos == 'b') {
+                                   printf("A fekete jatekos kovetkezik!\n");
+                              }
+                    } else {
+                         if (jatekos == 'w') {
+                              jatekos = 'b';
+                         } else if (jatekos == 'b') {
+                              jatekos = 'w';
+                         }
+                         aktualismegjelenit(&tabla[0][0]);
+                    }
                } else {
                     hibauzenet("bemeneti erteket");
                }
           } else if (sscanf(bemenet, "%d", &muvelet) == 1) {
-               //printf("\nSiker2 %d\n", muvelet);
           } else {
                hibauzenet("bemeneti erteket");
           }
      } while(muvelet != 9);
 }
 
-/*
-     betölt egy elmentett sakk játszmát, 
-*/
+//betölt egy elmentett sakk játszmát, 
 void jatekbetolt(int* navigal) {
 }
 
-/*
-     megjeleníti a használati útmutatót, megjeleníti a programmal kapcsolatos tudnivalókat
-*/
+//megjeleníti a használati útmutatót, megjeleníti a programmal kapcsolatos tudnivalókat
 void hasznalatiutmutato(int* navigal) {
      printf("- Sakk -\n\n- Leptetes\n");
      printf("Ket bemeneti erteket kell beirni (ketto darab koordinatat) a babuk leptetesehez egy jatszmaban. ");
@@ -187,24 +220,18 @@ void hasznalatiutmutato(int* navigal) {
      menu(navigal);
 }
 
-/*
-     ez a metódus kilép a programból
-*/
+//ez a metódus kilép a programból
 void kilepes() {
      exit(0);
 }
 
-/*
-     hibaüzenetet ír a felhasználónak, visszajelzést ad, ha helytelen bemeneti értéket adott meg a felhasználó
-*/
+//hibaüzenetet ír a felhasználónak, visszajelzést ad, ha helytelen bemeneti értéket adott meg a felhasználó
 void hibauzenet(char *uzenet) {
      printf("Kerem ervenyes %s adjon meg!\n\n", uzenet);
 }
 
-/*
-     amikor betölt a program ez a metódus fut le először, ez a metódus a menüt jelenti, itt dönti el a felhasználó,
-     hogy mit szeretne a programon belül csinálni, ez a metódus a felhasználó által választott metódust hívja meg
-*/
+//amikor betölt a program ez a metódus fut le először, ez a metódus a menüt jelenti, itt dönti el a felhasználó,
+//hogy mit szeretne a programon belül csinálni, ez a metódus a felhasználó által választott metódust hívja meg
 void menu(int* navigal) {
      printf("- Sakk -\n\n1. Uj jatek\n2. Jatek betoltese\n3. Hasznalati utmutato\n\n9. Kilepes\n\n");
      printf("Valasztas: ");
