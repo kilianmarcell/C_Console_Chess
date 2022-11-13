@@ -27,13 +27,13 @@ int helyesxy(int* x, int* y) {
 }
 
 //ellenőrzi, hogy érvényes pozíciót adott-e meg a felhasználó (sakk játszma közben)
-int helyes_sor_oszlop(char* sor, char* oszlop) {
-     *sor = tolower(*sor);
-     *oszlop = tolower(*oszlop);
+int helyes_sor_oszlop(char* honnanoszlop, char* hovaoszlop) {
+     *honnanoszlop = tolower(*honnanoszlop);
+     *hovaoszlop = tolower(*hovaoszlop);
      int szamol = 0;
      for(int i = 0; i < 8; i++) {
-          if (oszlopok[i] == *oszlop) ++szamol;
-          if (oszlopok[i] == *sor) ++szamol;
+          if (oszlopok[i] == *hovaoszlop) ++szamol;
+          if (oszlopok[i] == *honnanoszlop) ++szamol;
      }
 
      return (szamol == 2);
@@ -48,18 +48,14 @@ int betubol_szamra_konvertal(char* betu) {
      return 0;
 }
 
-//a bábu betűjének helyét (a babubetuk tömbben) átváltoztatja a bábu helyére (a babuk tömbben)
-int betubol_babura_konvertal(char* betu) {
-     for(int i = 0; i < 8; i++) {
-          if (babubetuk[i] == *betu) return (i);
-     }
-
-     return 0;
-}
-
 //egy bábunak a betűjéből és a színéből előállítja a bábut
 char *baburakonvertal(char betu, char szin) {
-     int hanyadik = betubol_babura_konvertal(&betu);
+     int hanyadik;
+     
+     for(int i = 0; i < 8; i++) {
+          if (babubetuk[i] == betu) hanyadik = i;
+     }
+
      if (szin == 'w') return babuk[hanyadik];
      if (szin == 'b') return babuk[hanyadik + 6];
      return " ";
@@ -127,7 +123,20 @@ int leptetes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
 
 //az átlós lépés helyességét ellenőrzi a metódus
 void atlos_lepes_ellenorzes(Mezo *honnan, Mezo *hova) {
-     int honnanx = honnan->x, honnany = honnan->y, hovax = hova->x, hovay = hova->y;
+     //int honnanx = honnan->x, honnany = honnan->y, hovax = hova->x, hovay = hova->y;
+
+     int i = 0;
+     int siker = 0;
+     if (helyesxy(honnan->x + 1, honnan->y + 1) == 1) {
+          if (tabla[honnan->x + 1][honnan->y + 1].babu == '-' ||
+          &tabla[honnan->x + 1][honnan->y + 1] == &tabla[hova->x][hova->y]) {
+
+               atlos_lepes_ellenorzes(&tabla[honnan->x + 1][honnan->y + 1], hova);
+          }
+     }
+     while(helyesxy(honnan->x + i, honnan->y + i) == 1 && tabla[honnan->x + i][honnan->y + i].babu == '-') {
+          ++i;
+     }
 }
 
 //az egyenes lépés helyességét ellenőrzi a metódus
@@ -164,7 +173,7 @@ void ideiglenesellenoriz(Mezo* honnan, Mezo* hova, char szin) {
                     }
                     printf("nem fuggoleges");
                }
-               //TODO: ütés, csere, en passant
+               //TODO: csere, en passant
           } else if (honnan->szin == 'b') {
                if (honnan->y == hova->y) {
                     if (honnan->x == hova->x - 1 && hova->babu == '-') {
@@ -188,7 +197,7 @@ void ideiglenesellenoriz(Mezo* honnan, Mezo* hova, char szin) {
                     }
                     printf("nem fuggoleges");
                }
-               //TODO: ütés, csere, en passant
+               //TODO: csere, en passant
           } else {
                printf("sikertelen lepes");
                //return 0;
@@ -225,16 +234,16 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      hova->babu = ideiglenesbabu;
      hova->szin = ideiglenesszin;
 
-     Lepes *l;
-     l = (Lepes*) malloc(sizeof(Lepes));
-     char jelenlepes[5];
-     l->lepes[0] = (char) oszlopok[honnan->y];
-     l->lepes[1] = (char) honnan->x;
-     l->lepes[2] = ' ';
-     l->lepes[3] = (char) oszlopok[hova->y];
-     l->lepes[4] = (char) hova->x;
-     l->kovetkezo_lepes = NULL;
-     utsolepes
+     // Lepes *l;
+     // l = (Lepes*) malloc(sizeof(Lepes));
+     // char jelenlepes[5];
+     // l->lepes[0] = (char) oszlopok[honnan->y];
+     // l->lepes[1] = (char) honnan->x;
+     // l->lepes[2] = ' ';
+     // l->lepes[3] = (char) oszlopok[hova->y];
+     // l->lepes[4] = (char) hova->x;
+     // l->kovetkezo_lepes = NULL;
+     //utsolepes
 
      return 1;
 }

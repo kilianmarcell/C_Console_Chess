@@ -1,0 +1,55 @@
+Sakk dokumentáció
+Adatszerkezet
+A program futtatásakor a menu függvény hívódik meg. Innen indul a program. Itt dönti el a felhasználó, hogy mire is szeretné a programot használni. Számokkal tud navigálni a különböző opciók között.
+
+Konstansok
+
+Mezo tabla[8][8]
+Ez a Mezo mátrix tárolja el a sakktáblát.
+
+char oszlopok[]
+Ez a tömb tárlolja az oszlopook betűit.
+
+char babubetuk[]
+Ez a tömb a bábuknak megfelelő betűket tárolja.
+
+char *babuk[]
+Ez a karaktertömb tárolja a bábukat.
+
+Program vezérlése, függvények
+int helyesxy(int* x, int* y)
+Ellenőrzi, hogy a paraméterként érkező x és y értékek a sakktáblán belülre mutatnak-e (0 és 9 között vannak-e).
+
+int helyes_sor_oszlop(char* honnanoszlop, char* hovaoszlop)
+Ellenőrzi, hogy a táblán belülre szeretne-e lépni a játékos.
+
+int betubol_szamra_konvertal(char* betu)
+Megkeresi az oszlopok karaktertömbből a keresett betű indexét, ezt adja vissza a függvény.
+
+char *baburakonvertal(char betu, char szin)
+Ez a függvény konvertálja át a paraméterként beérkező betűt a megfelelő bábura, a bábuknak színeik is vannak, emiatt kell paraméterként a szín is.
+
+void aktualis_megjelenit(Mezo* m)
+Ez a metódus jeleníti meg a sakktáblát és a különböző navigációs lehetőségeket.
+
+int leptetes_ellenorzes(Mezo* honnan, Mezo* hova, char szin)
+Ez a metódus ellenőrzi, hogy helyes-e egy bábunak a lépése. Ellenőrizni kell, hogy léphetnek-e a bábuk a megadott helyre, a felhasználó tévedhet.
+
+void atlos_lepes_ellenorzes(Mezo *honnan, Mezo *hova)
+Ez a metódus ellenőrzi az átlós lépések helyességét.
+
+void egyenes_lepes_ellenorzes(Mezo *honnan, Mezo *hova)
+Ez a metódus ellenőrzi az egyenes lépések helyességét.
+
+int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin)
+Két paraméterként beérkező mező értékeit megcseréli, ha ütés történik, akkor a lépett helyről eltűnika bábu.
+
+void uj_jatek()
+Ez a metódus tölti fel a táblát a bábukkal/üres mezőkkel.
+
+void jatek_betolt(int* navigal)
+void hasznalati_utmutato(int* navigal)
+void kilepes()
+void hibauzenet(char *uzenet)
+void menu(int* navigal)
+int main(void)
