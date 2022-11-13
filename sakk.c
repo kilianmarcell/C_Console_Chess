@@ -1,16 +1,14 @@
 #include <stdio.h>
+#include "mezo.h"
+#include "lepes.h"
 #include "debugmalloc.h"
 
 void menu(int* navigal);
 void hibauzenet(char *uzenet);
 
-//itt adom meg, hogy milyen tulajdonságai vannak egy mezőnek
-typedef struct {
-     int x; //sor
-     int y; //oszlop
-     char babu; //király = k, királynő = q, futó = b, ló = h, bástya = r, paraszt = p
-     char szin; //fehér = w, fekete = b
-} Mezo;
+Mezo tabla[8][8];
+
+Lepes lepes;
 
 //a sakktábla oszlopait tárolja a karaktertömb
 char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
@@ -21,9 +19,53 @@ char babubetuk[] = { 'k', 'q', 'r', 'b', 'h', 'p' };
 //a sakkbábukat tárolja el a "karaktertömb"
 char *babuk[] = { "♔", "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜", "♝", "♞", "♟︎" };
 
+//ellenőrzi, hogy érvényes sorokat adott-e meg a felhasználó (sakk játszma közben)
+int helyesxy(int* x, int* y) {
+     return (*x >= 1 && *x <= 8 && *y >= 1 && *y <= 8);
+}
+
+//ellenőrzi, hogy érvényes pozíciót adott-e meg a felhasználó (sakk játszma közben)
+int helyes_sor_oszlop(char* sor, char* oszlop) {
+     *sor = tolower(*sor);
+     *oszlop = tolower(*oszlop);
+     int szamol = 0;
+     for(int i = 0; i < 8; i++) {
+          if (oszlopok[i] == *oszlop) ++szamol;
+          if (oszlopok[i] == *sor) ++szamol;
+     }
+
+     return (szamol == 2);
+}
+
+//a játékos által megadott betűt egy y koordinátává változtatja
+int betubol_szamra_konvertal(char* betu) {
+     for(int i = 0; i < 8; i++) {
+          if (oszlopok[i] == *betu) return (i);
+     }
+
+     return 0;
+}
+
+int betubol_babura_konvertal(char* betu) {
+     for(int i = 0; i < 8; i++) {
+          if (babubetuk[i] == *betu) return (i);
+     }
+
+     return 0;
+}
+
+char *baburakonvertal(char betu, char szin) {
+     int hanyadik = betubol_babura_konvertal(&betu);
+     if (szin == 'w') {
+          return babuk[hanyadik];
+     } else if (szin == 'b') {
+          return babuk[hanyadik + 6];
+     }
+     return " ";
+}
 
 //ez a metódus kiírja az aktuális táblát és a navigációkat
-void aktualismegjelenit(Mezo* m) {
+void aktualis_megjelenit(Mezo* m) {
      //system("cls");
      printf("\n    ");
      for (int i = 0; i < 8; i++) {
@@ -42,7 +84,7 @@ void aktualismegjelenit(Mezo* m) {
           } else {
                printf("%d |", 8 - szamol);
                for(int j = 0; j < 8; j++) {
-                    printf(" %c |", m->babu);
+                    printf(" %s |", baburakonvertal(m->babu, m->szin));
                     m++;
                }
                szamol++;
@@ -52,58 +94,150 @@ void aktualismegjelenit(Mezo* m) {
      printf("\n1. Jatek mentese\n2. Visszalepes\n\n9. Kilepes\n\n");
 }
 
-//ellenőrzi, hogy érvényes sorokat adott-e meg a felhasználó (sakk játszma közben)
-int helyesxy(int* x, int* y) {
-     return (*x >= 1 && *x <= 8 && *y >= 1 && *y <= 8);
-}
+//ellenőrzi, hogy helyes bábut akarunk e léptetni
+int leptetes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
+     char ellenkezoszin; 
+     if (szin == 'w') ellenkezoszin = 'b';
+     if (szin == 'b') ellenkezoszin = 'w';
 
-//ellenőrzi, hogy érvényes oszlopokat adott-e meg a felhasználó (sakk játszma közben)
-int helyessoroszlop(char* sor, char* oszlop) {
-     *sor = tolower(*sor);
-     *oszlop = tolower(*oszlop);
-     int szamol = 0;
-     for(int i = 0; i < 8; i++) {
-          if (oszlopok[i] == *oszlop) ++szamol;
-          if (oszlopok[i] == *sor) ++szamol;
+     //paraszt bábu léptetése
+     if (honnan->babu == 'p') {
+          if (honnan->szin == 'w') {
+               if (honnan->y == hova->y) {
+                    if (honnan->x == hova->x + 1) return 1;
+                    if (honnan->x == 6 && honnan->x == hova->x + 2) printf("\n\nsiker\n\n");
+               } else if (honnan->x == hova->x + 1 &&
+                    (honnan->y == hova->y + 1 && tabla[hova->x][hova->y + 1].szin != (szin || '-')) ||
+                    (honnan->y == hova->y - 1 && tabla[hova->x][hova->y - 1].szin != (szin || '-'))
+               ) {
+                    printf("siker2");
+               }
+          } else {
+               printf("nope");
+               return 0;
+          }
+               //TODO: en passant, bábucsere
+          if (honnan->szin == 'b') {
+               if (honnan->y == hova->y) {
+                    if (honnan->x == hova->x + 1) return 1;
+                    if (honnan->x == 1 && honnan->x == hova->x - 2) return 1;
+               }
+               if (honnan->x == hova->x + 1 &&
+               (honnan->y == hova->y - 2 && tabla[hova->x][hova->y - 2].szin != (szin || '-')) ||
+               (honnan->y == hova->y && tabla[hova->x][hova->y].szin != szin ||
+               tabla[hova->x][hova->y].szin != szin)) return 1;
+
+               //TODO: en passant, bábucsere
+               return 0;
+          }
      }
-
-     return (szamol == 2);
-}
-
-//a játékos által megadott betűt egy y koordinátává változtatja
-int betubolszamrakonvertal(char* betu) {
-     int szamol = 0;
-     for(int i = 0; i < 8; i++) {
-          if (oszlopok[i] == *betu) return (i);
+     if (honnan->babu == 'k') {
+          if (honnan->szin == 'w') {
+          }
+          if (honnan->szin == 'w') {
+          }
+     }
+     if (honnan->babu == 'q') {
+          if (honnan->szin == 'w') {
+          }
+          if (honnan->szin == 'w') {
+          }
+     }
+     if (honnan->babu == 'b') {
+          if (honnan->szin == 'w') {
+          }
+          if (honnan->szin == 'w') {
+          }
+     }
+     if (honnan->babu == 'h') {
+          if (honnan->szin == 'w') {
+          }
+          if (honnan->szin == 'w') {
+          }
+     }
+     if (honnan->babu == 'r') {
+          if (honnan->szin == 'w') {
+          }
+          if (honnan->szin == 'w') {
+          }
      }
 
      return 0;
+}
+
+
+void ideiglenesellenoriz(Mezo* honnan, Mezo* hova, char szin) {
+     char ellenkezoszin; 
+     if (szin == 'w') ellenkezoszin = 'b';
+     if (szin == 'b') ellenkezoszin = 'w';
+
+     if (honnan->babu == 'p') {
+          if (honnan->szin == 'w') {
+               if (honnan->y == hova->y) {
+                    if (honnan->x == hova->x + 1) {
+                         printf("\nsikeres elore lepes\n");
+                         //return 1;
+                    } else if (honnan->x == 6 && honnan->x == hova->x + 2) {
+                         printf("\nsikeres 2 lepes\n");
+                         //return 1;
+                    } else {
+                         printf("sikertelen lepes");
+                         //return 0;
+                    }
+               } else {
+                    printf("nem fuggoleges");
+               }
+               //TODO: ütés, csere, en passant
+          } else if (honnan->szin == 'b') {
+               if (honnan->y == hova->y) {
+                    if (honnan->x == hova->x - 1) {
+                         printf("\nsikeres elore lepes\n");
+                         //return 1;
+                    } else if (honnan->x == 1 && honnan->x == hova->x - 2) {
+                         printf("\nsikeres 2 lepes\n");
+                         //return 1;
+                    } else {
+                         printf("sikertelen lepes");
+                         //return 0;
+                    }
+               } else {
+                    printf("nem fuggoleges");
+               }
+               //TODO: ütés, csere, en passant
+          } else {
+               printf("sikertelen lepes");
+               //return 0;
+          }
+     }
 }
 
 //kettő mezőt megcserél
-int poziciocserel(Mezo* honnan, Mezo* hova, char szin) {
-     if (honnan->babu != '-' && honnan->szin == szin) {
-          int x = honnan->x, y = honnan->y;
-          char babu = honnan->babu, szin = honnan->szin;
+int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
+     char ellenkezoszin; 
+     if (szin == 'w') ellenkezoszin = 'b';
+     if (szin == 'b') ellenkezoszin = 'w';
 
-          honnan->x = hova->x;
-          honnan->y = hova->y;
+     if (honnan->babu == '-' || honnan->szin != szin) return 0; //ha nem a soron lévő játkos lép akkor 0-t ad vissza
+     if (hova->szin == szin/* || ellenoriz == 0*/) return 2; //ha nem szabályosan lép a játékos 2-t ad vissza
+     ideiglenesellenoriz(honnan, hova, szin);
+     char ideiglenesbabu = honnan->babu;
+     char ideiglenesszin = honnan->szin;
+
+     if (hova->szin == ellenkezoszin) {
+          honnan->babu = '-';
+          honnan->szin = '-';
+     } else {
           honnan->babu = hova->babu;
           honnan->szin = hova->szin;
-
-          hova->x = x;
-          hova->y = y;
-          hova->babu = babu;
-          hova->szin = szin;
-          return 1;
      }
-     
-     return 0;
+
+     hova->babu = ideiglenesbabu;
+     hova->szin = ideiglenesszin;
+     return 1;
 }
 
 //betölt egy sakktáblát, innen kezdődik a játék
-void ujjatek() {
-     Mezo tabla[8][8];
+void uj_jatek() {
      //tábla feltöltése
      for(int i = 0; i < 8; i++) {
           for(int j = 0; j < 8; j++) {
@@ -150,33 +284,35 @@ void ujjatek() {
           tabla[7][i].szin = 'w';
      }
      
-     int muvelet, x, y;
+     int muvelet, x, y, ellenoriz;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
 
      gets(bemenet);
-     aktualismegjelenit(&tabla[0][0]);
+     aktualis_megjelenit(&tabla[0][0]);
      do {
           (jatekos == 'w') ? printf("Feher") : printf("Fekete");
           printf(" jatekos: ");
           gets(bemenet);
           if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
-               if (helyesxy(&x, &y) && helyessoroszlop(&sor, &oszlop)) {
-                    if (poziciocserel(&tabla[7 - (x - 1)][betubolszamrakonvertal(&sor)],
-                         &tabla[7 - (y - 1)][betubolszamrakonvertal(&oszlop)],
-                         jatekos) == 0) {
+               if (helyesxy(&x, &y) && helyes_sor_oszlop(&sor, &oszlop)) {
+                    ellenoriz = pozicio_cserel(&tabla[7 - (x - 1)][betubol_szamra_konvertal(&sor)],
+                         &tabla[7 - (y - 1)][betubol_szamra_konvertal(&oszlop)], jatekos);
+                    if (ellenoriz == 0) {
                               if (jatekos == 'w') {
                                    printf("A feher jatekos kovetkezik!\n");
                               } else if (jatekos == 'b') {
                                    printf("A fekete jatekos kovetkezik!\n");
                               }
-                    } else {
+                    } else if (ellenoriz == 2) {
+                         hibauzenet("lepest");
+                    } else if (ellenoriz == 1) {
                          if (jatekos == 'w') {
                               jatekos = 'b';
                          } else if (jatekos == 'b') {
                               jatekos = 'w';
                          }
-                         aktualismegjelenit(&tabla[0][0]);
+                         aktualis_megjelenit(&tabla[0][0]);
                     }
                } else {
                     hibauzenet("bemeneti erteket");
@@ -189,11 +325,11 @@ void ujjatek() {
 }
 
 //betölt egy elmentett sakk játszmát, 
-void jatekbetolt(int* navigal) {
+void jatek_betolt(int* navigal) {
 }
 
 //megjeleníti a használati útmutatót, megjeleníti a programmal kapcsolatos tudnivalókat
-void hasznalatiutmutato(int* navigal) {
+void hasznalati_utmutato(int* navigal) {
      printf("- Sakk -\n\n- Leptetes\n");
      printf("Ket bemeneti erteket kell beirni (ketto darab koordinatat) a babuk leptetesehez egy jatszmaban. ");
      printf("Az elso az a pozicio amelyik helyrol szeretnenk leptetni a babunkat, ");
@@ -240,15 +376,15 @@ void menu(int* navigal) {
      switch (*navigal) {
           case 1:
                system("cls");
-               ujjatek();
+               uj_jatek();
                break;
           case 2:
                system("cls");
-               jatekbetolt(navigal);
+               jatek_betolt(navigal);
                break;
           case 3:
                system("cls");
-               hasznalatiutmutato(navigal);
+               hasznalati_utmutato(navigal);
                break;
           case 9:
                kilepes();
