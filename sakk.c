@@ -8,7 +8,9 @@ void hibauzenet(char *uzenet);
 
 Mezo tabla[8][8];
 
-Lepes lepes;
+Lepes *lepes;
+Lepes *elsolepes;
+//lepes->kovetkezo_lepes = elsolepes;
 
 //a sakktábla oszlopait tárolja a karaktertömb
 char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
@@ -46,6 +48,7 @@ int betubol_szamra_konvertal(char* betu) {
      return 0;
 }
 
+//a bábu betűjének helyét (a babubetuk tömbben) átváltoztatja a bábu helyére (a babuk tömbben)
 int betubol_babura_konvertal(char* betu) {
      for(int i = 0; i < 8; i++) {
           if (babubetuk[i] == *betu) return (i);
@@ -54,13 +57,11 @@ int betubol_babura_konvertal(char* betu) {
      return 0;
 }
 
+//egy bábunak a betűjéből és a színéből előállítja a bábut
 char *baburakonvertal(char betu, char szin) {
      int hanyadik = betubol_babura_konvertal(&betu);
-     if (szin == 'w') {
-          return babuk[hanyadik];
-     } else if (szin == 'b') {
-          return babuk[hanyadik + 6];
-     }
+     if (szin == 'w') return babuk[hanyadik];
+     if (szin == 'b') return babuk[hanyadik + 6];
      return " ";
 }
 
@@ -94,43 +95,8 @@ void aktualis_megjelenit(Mezo* m) {
      printf("\n1. Jatek mentese\n2. Visszalepes\n\n9. Kilepes\n\n");
 }
 
-//ellenőrzi, hogy helyes bábut akarunk e léptetni
+//ellenőrzi a léptetni kívánt bábu lépését
 int leptetes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
-     char ellenkezoszin; 
-     if (szin == 'w') ellenkezoszin = 'b';
-     if (szin == 'b') ellenkezoszin = 'w';
-
-     //paraszt bábu léptetése
-     if (honnan->babu == 'p') {
-          if (honnan->szin == 'w') {
-               if (honnan->y == hova->y) {
-                    if (honnan->x == hova->x + 1) return 1;
-                    if (honnan->x == 6 && honnan->x == hova->x + 2) printf("\n\nsiker\n\n");
-               } else if (honnan->x == hova->x + 1 &&
-                    (honnan->y == hova->y + 1 && tabla[hova->x][hova->y + 1].szin != (szin || '-')) ||
-                    (honnan->y == hova->y - 1 && tabla[hova->x][hova->y - 1].szin != (szin || '-'))
-               ) {
-                    printf("siker2");
-               }
-          } else {
-               printf("nope");
-               return 0;
-          }
-               //TODO: en passant, bábucsere
-          if (honnan->szin == 'b') {
-               if (honnan->y == hova->y) {
-                    if (honnan->x == hova->x + 1) return 1;
-                    if (honnan->x == 1 && honnan->x == hova->x - 2) return 1;
-               }
-               if (honnan->x == hova->x + 1 &&
-               (honnan->y == hova->y - 2 && tabla[hova->x][hova->y - 2].szin != (szin || '-')) ||
-               (honnan->y == hova->y && tabla[hova->x][hova->y].szin != szin ||
-               tabla[hova->x][hova->y].szin != szin)) return 1;
-
-               //TODO: en passant, bábucsere
-               return 0;
-          }
-     }
      if (honnan->babu == 'k') {
           if (honnan->szin == 'w') {
           }
@@ -138,12 +104,6 @@ int leptetes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
           }
      }
      if (honnan->babu == 'q') {
-          if (honnan->szin == 'w') {
-          }
-          if (honnan->szin == 'w') {
-          }
-     }
-     if (honnan->babu == 'b') {
           if (honnan->szin == 'w') {
           }
           if (honnan->szin == 'w') {
@@ -165,6 +125,15 @@ int leptetes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
      return 0;
 }
 
+//az átlós lépés helyességét ellenőrzi a metódus
+void atlos_lepes_ellenorzes(Mezo *honnan, Mezo *hova) {
+     int honnanx = honnan->x, honnany = honnan->y, hovax = hova->x, hovay = hova->y;
+}
+
+//az egyenes lépés helyességét ellenőrzi a metódus
+void egyenes_lepes_ellenorzes(Mezo *honnan, Mezo *hova) {
+     int honnanx = honnan->x, honnany = honnan->y, hovax = hova->x, hovay = hova->y;
+}
 
 void ideiglenesellenoriz(Mezo* honnan, Mezo* hova, char szin) {
      char ellenkezoszin; 
@@ -174,7 +143,7 @@ void ideiglenesellenoriz(Mezo* honnan, Mezo* hova, char szin) {
      if (honnan->babu == 'p') {
           if (honnan->szin == 'w') {
                if (honnan->y == hova->y) {
-                    if (honnan->x == hova->x + 1) {
+                    if (honnan->x == hova->x + 1 && hova->babu == '-') {
                          printf("\nsikeres elore lepes\n");
                          //return 1;
                     } else if (honnan->x == 6 && honnan->x == hova->x + 2) {
@@ -185,12 +154,20 @@ void ideiglenesellenoriz(Mezo* honnan, Mezo* hova, char szin) {
                          //return 0;
                     }
                } else {
+                    if (honnan->x == hova->x + 1 && (honnan->y == hova->y - 1 || honnan->y == hova->y + 1 ) &&
+                    hova->szin == ellenkezoszin) {
+                         printf("sikeres utes");
+                         //return 1;
+                    } else {
+                         printf("sikertelen lepes");
+                         //return 0;
+                    }
                     printf("nem fuggoleges");
                }
                //TODO: ütés, csere, en passant
           } else if (honnan->szin == 'b') {
                if (honnan->y == hova->y) {
-                    if (honnan->x == hova->x - 1) {
+                    if (honnan->x == hova->x - 1 && hova->babu == '-') {
                          printf("\nsikeres elore lepes\n");
                          //return 1;
                     } else if (honnan->x == 1 && honnan->x == hova->x - 2) {
@@ -201,12 +178,26 @@ void ideiglenesellenoriz(Mezo* honnan, Mezo* hova, char szin) {
                          //return 0;
                     }
                } else {
+                    if (honnan->x == hova->x - 1 && (honnan->y == hova->y + 1 || honnan->y == hova->y - 1 ) &&
+                    hova->szin == ellenkezoszin) {
+                         printf("sikeres utes");
+                         //return 1;
+                    } else {
+                         printf("sikertelen lepes");
+                         //return 0;
+                    }
                     printf("nem fuggoleges");
                }
                //TODO: ütés, csere, en passant
           } else {
                printf("sikertelen lepes");
                //return 0;
+          }
+     }
+     if (honnan->babu == 'b') {
+          if (honnan->szin == 'w') {
+          }
+          if (honnan->szin == 'w') {
           }
      }
 }
@@ -233,6 +224,18 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
 
      hova->babu = ideiglenesbabu;
      hova->szin = ideiglenesszin;
+
+     Lepes *l;
+     l = (Lepes*) malloc(sizeof(Lepes));
+     char jelenlepes[5];
+     l->lepes[0] = (char) oszlopok[honnan->y];
+     l->lepes[1] = (char) honnan->x;
+     l->lepes[2] = ' ';
+     l->lepes[3] = (char) oszlopok[hova->y];
+     l->lepes[4] = (char) hova->x;
+     l->kovetkezo_lepes = NULL;
+     utsolepes
+
      return 1;
 }
 
