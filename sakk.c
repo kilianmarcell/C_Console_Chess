@@ -78,52 +78,77 @@ char *baburakonvertal(char betu, char szin) {
      return " ";
 }
 
-//ellenőrzi, hogy a táblán belül van-e a mező
-int tablan_belul_van_e(Mezo* jelenlegi) {
-     return jelenlegi->x >= 0 && jelenlegi->x <= 7 && jelenlegi->y >= 0 && jelenlegi->y <= 7;
-}
-
-//a ló lépését, csak akkor ellenőrzi le a program, ha a sakktáblán belül vannak a koordináták
-int lo_lepes_validalo(int x, int y) {
+//ellenőrzi, hogy a koordináták a táblán belülre mutatnak-e
+int tablan_belul_van_e(int x, int y) {
      return (x >= 0 && x <= 7 && y >= 0 && y <= 7);
 }
 
 //-------------------------------------------------------------------------------------------------------
 
-//Ló lépései
+//ló lépései
 int lo_lepes(Mezo* jelenlegi, Mezo* hova) {
-     if (lo_lepes_validalo(jelenlegi->x - 1, jelenlegi->y + 2)) {
+     if (tablan_belul_van_e(jelenlegi->x - 1, jelenlegi->y + 2)) {
           if (&tabla[jelenlegi->x - 1][jelenlegi->y + 2] == hova) return 1;
      }
-     if (lo_lepes_validalo(jelenlegi->x - 1, jelenlegi->y - 2)) {
+     if (tablan_belul_van_e(jelenlegi->x - 1, jelenlegi->y - 2)) {
           if (&tabla[jelenlegi->x - 1][jelenlegi->y - 2] == hova) return 1;
      }
-     if (lo_lepes_validalo(jelenlegi->x - 2, jelenlegi->y + 1)) {
+     if (tablan_belul_van_e(jelenlegi->x - 2, jelenlegi->y + 1)) {
           if (&tabla[jelenlegi->x - 2][jelenlegi->y + 1] == hova) return 1;
      }
-     if (lo_lepes_validalo(jelenlegi->x - 2, jelenlegi->y - 1)) {
+     if (tablan_belul_van_e(jelenlegi->x - 2, jelenlegi->y - 1)) {
           if (&tabla[jelenlegi->x - 2][jelenlegi->y - 1] == hova) return 1;
      }
-     if (lo_lepes_validalo(jelenlegi->x + 1, jelenlegi->y + 2)) {
+     if (tablan_belul_van_e(jelenlegi->x + 1, jelenlegi->y + 2)) {
           if (&tabla[jelenlegi->x + 1][jelenlegi->y + 2] == hova) return 1;
      }
-     if (lo_lepes_validalo(jelenlegi->x + 1, jelenlegi->y - 2)) {
+     if (tablan_belul_van_e(jelenlegi->x + 1, jelenlegi->y - 2)) {
           if (&tabla[jelenlegi->x + 1][jelenlegi->y - 2] == hova) return 1;
      }
-     if (lo_lepes_validalo(jelenlegi->x + 2, jelenlegi->y + 1)) {
+     if (tablan_belul_van_e(jelenlegi->x + 2, jelenlegi->y + 1)) {
           if (&tabla[jelenlegi->x + 2][jelenlegi->y + 1] == hova) return 1;
      }
-     if (lo_lepes_validalo(jelenlegi->x + 2, jelenlegi->y - 1)) {
+     if (tablan_belul_van_e(jelenlegi->x + 2, jelenlegi->y - 1)) {
           if (&tabla[jelenlegi->x + 2][jelenlegi->y - 1] == hova) return 1;
      }
 
      return 0;
 }
 
-//Átlós lépések
+//király lépései
+int kiraly_lepes(Mezo* jelenlegi, Mezo* hova) {
+     if (tablan_belul_van_e(jelenlegi->x - 1, jelenlegi->y)) {
+          if (&tabla[jelenlegi->x - 1][jelenlegi->y] == hova) return 1;
+     }
+     if (tablan_belul_van_e(jelenlegi->x - 1, jelenlegi->y + 1)) {
+          if (&tabla[jelenlegi->x - 1][jelenlegi->y + 1] == hova) return 1;
+     }
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y + 1)) {
+          if (&tabla[jelenlegi->x][jelenlegi->y + 1] == hova) return 1;
+     }
+     if (tablan_belul_van_e(jelenlegi->x + 1, jelenlegi->y + 1)) {
+          if (&tabla[jelenlegi->x + 1][jelenlegi->y + 1] == hova) return 1;
+     }
+     if (tablan_belul_van_e(jelenlegi->x + 1, jelenlegi->y)) {
+          if (&tabla[jelenlegi->x + 1][jelenlegi->y] == hova) return 1;
+     }
+     if (tablan_belul_van_e(jelenlegi->x + 1, jelenlegi->y - 1)) {
+          if (&tabla[jelenlegi->x + 1][jelenlegi->y - 1] == hova) return 1;
+     }
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y - 1)) {
+          if (&tabla[jelenlegi->x][jelenlegi->y - 1] == hova) return 1;
+     }
+     if (tablan_belul_van_e(jelenlegi->x - 1, jelenlegi->y - 1)) {
+          if (&tabla[jelenlegi->x - 1][jelenlegi->y - 1] == hova) return 1;
+     }
+
+     return 0;
+}
+
+//átlós lépések
 //egy bábunak a jobbra felfele átlós lépését ellenőrzi
 int jobbra_fel_lepes(Mezo* jelenlegi, Mezo* hova) {
-     if (tablan_belul_van_e(jelenlegi)) {
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi == hova) return 1;
           if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
           if (jelenlegi != hova && jelenlegi->x - 1 >= 0 && jelenlegi->y + 1 <= 7) {
@@ -136,7 +161,7 @@ int jobbra_fel_lepes(Mezo* jelenlegi, Mezo* hova) {
 
 //egy bábunak a jobbra lefele átlós lépését ellenőrzi
 int jobbra_le_lepes(Mezo* jelenlegi, Mezo* hova) {
-     if (tablan_belul_van_e(jelenlegi)) {
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi == hova) return 1;
           if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
           if (jelenlegi != hova && jelenlegi->x + 1 >= 0 && jelenlegi->y + 1 <= 7) {
@@ -149,7 +174,7 @@ int jobbra_le_lepes(Mezo* jelenlegi, Mezo* hova) {
 
 //egy bábunak a balra felfele átlós lépését ellenőrzi
 int balra_fel_lepes(Mezo* jelenlegi, Mezo* hova) {
-     if (tablan_belul_van_e(jelenlegi)) {
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi == hova) return 1;
           if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
           if (jelenlegi != hova && jelenlegi->x - 1 >= 0 && jelenlegi->y - 1 <= 7) {
@@ -162,7 +187,7 @@ int balra_fel_lepes(Mezo* jelenlegi, Mezo* hova) {
 
 //egy bábunak a balra lefele átlós lépését ellenőrzi
 int balra_le_lepes(Mezo* jelenlegi, Mezo* hova) {
-     if (tablan_belul_van_e(jelenlegi)) {
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi == hova) return 1;
           if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
           if (jelenlegi != hova && jelenlegi->x + 1 >= 0 && jelenlegi->y - 1 <= 7) {
@@ -183,10 +208,10 @@ int atlosan_jo_e(Mezo* honnan, Mezo* hova) {
      return 0;
 }
 
-//Egyenes lépések
+//egyenes lépések
 //az egyenesen felfele lépés helyességét ellenőrzi a metódus
 int egyenes_fel_lepes(Mezo *jelenlegi, Mezo *hova) {
-     if (tablan_belul_van_e(jelenlegi)) {
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi == hova) return 1;
           if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
           if (jelenlegi != hova && jelenlegi->x - 1 >= 0) {
@@ -199,7 +224,7 @@ int egyenes_fel_lepes(Mezo *jelenlegi, Mezo *hova) {
 
 //az egyenesen lefele lépés helyességét ellenőrzi a metódus
 int egyenes_le_lepes(Mezo *jelenlegi, Mezo *hova) {
-     if (tablan_belul_van_e(jelenlegi)) {
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi == hova) return 1;
           if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
           if (jelenlegi != hova && jelenlegi->x + 1 <= 7) {
@@ -212,7 +237,7 @@ int egyenes_le_lepes(Mezo *jelenlegi, Mezo *hova) {
 
 //az egyenesen jobbra lépés helyességét ellenőrzi a metódus
 int egyenes_jobbra_lepes(Mezo *jelenlegi, Mezo *hova) {
-     if (tablan_belul_van_e(jelenlegi)) {
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi == hova) return 1;
           if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
           if (jelenlegi != hova && jelenlegi->y + 1 <= 7) {
@@ -225,7 +250,7 @@ int egyenes_jobbra_lepes(Mezo *jelenlegi, Mezo *hova) {
 
 //az egyenesen balra lépés helyességét ellenőrzi a metódus
 int egyenes_balra_lepes(Mezo *jelenlegi, Mezo *hova) {
-     if (tablan_belul_van_e(jelenlegi)) {
+     if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi == hova) return 1;
           if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
           if (jelenlegi != hova && jelenlegi->y - 1 >= 0) {
@@ -386,6 +411,13 @@ void lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
 
      //király lépésének ellenőrzése
      if (honnan->babu == 'k') {
+          if (kiraly_lepes(honnan, hova)) {
+               printf("Sikeres lepes");
+               //return 1;
+          } else {
+               printf("Sikertelen lepes");
+               //return 0;
+          }
      }
 }
 
