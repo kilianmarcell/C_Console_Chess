@@ -1,6 +1,9 @@
 {
      "files.associations": {
           "debugmalloc.h": "c",
-          "stdio.h": "c"
+          "stdio.h": "c",
+          "mezo.h": "c",
+          "konstansok.h": "c",
+          "lepes.h": "c"
      }
 }

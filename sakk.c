@@ -1,10 +1,15 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include "mezo.h"
 #include "lepes.h"
 #include "debugmalloc.h"
 
 void menu(int* navigal);
 void hibauzenet(char *uzenet);
+int jobbra_fel_lepes(Mezo* jelenlegi, Mezo* hova, char szin);
+int jobbra_le_lepes(Mezo* jelenlegi, Mezo* hova, char szin);
+int balra_fel_lepes(Mezo* jelenlegi, Mezo* hova, char szin);
+int balra_le_lepes(Mezo* jelenlegi, Mezo* hova, char szin);
 
 Mezo tabla[8][8];
 
@@ -22,7 +27,7 @@ char babubetuk[] = { 'k', 'q', 'r', 'b', 'h', 'p' };
 char *babuk[] = { "♔", "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜", "♝", "♞", "♟︎" };
 
 //ellenőrzi, hogy érvényes sorokat adott-e meg a felhasználó (sakk játszma közben)
-int helyesxy(int* x, int* y) {
+bool helyesxy(int* x, int* y) {
      return (*x >= 1 && *x <= 8 && *y >= 1 && *y <= 8);
 }
 
@@ -60,6 +65,45 @@ char *baburakonvertal(char betu, char szin) {
      if (szin == 'b') return babuk[hanyadik + 6];
      return " ";
 }
+
+//Különböző lépések ellenőrzései
+//egy bábunak a jobbra lefele átlós lépését ellenőrzi
+int jobbra_le_lepes(Mezo *jelenlegi, Mezo* hova, char szin) {
+     if (jelenlegi->x >= 0 && jelenlegi->x <= 7 && jelenlegi->y >= 0 && jelenlegi->y <= 7) {
+          if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
+          if (jelenlegi == hova) return 1;
+          if (jelenlegi != hova && jelenlegi->x + 1 >= 0 && jelenlegi->y + 1 <= 7) {
+               if (jobbra_fel_lepes(&tabla[jelenlegi->x + 1][jelenlegi->y + 1], hova, szin)) return 1;
+          }
+     }
+     return 0;
+}
+
+//egy bábunak a balra felfele átlós lépését ellenőrzi
+int balra_fel_lepes(Mezo *jelenlegi, Mezo* hova, char szin) {
+     if (jelenlegi->x >= 0 && jelenlegi->x <= 7 && jelenlegi->y >= 0 && jelenlegi->y <= 7) {
+          if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
+          if (jelenlegi == hova) return 1;
+          if (jelenlegi != hova && jelenlegi->x - 1 >= 0 && jelenlegi->y - 1 <= 7) {
+               if (jobbra_fel_lepes(&tabla[jelenlegi->x - 1][jelenlegi->y - 1], hova, szin)) return 1;
+          }
+     }
+     return 0;
+}
+
+//egy bábunak a balra lefele átlós lépését ellenőrzi
+int balra_le_lepes(Mezo *jelenlegi, Mezo* hova, char szin) {
+     if (jelenlegi->x >= 0 && jelenlegi->x <= 7 && jelenlegi->y >= 0 && jelenlegi->y <= 7) {
+          if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
+          if (jelenlegi == hova) return 1;
+          if (jelenlegi != hova && jelenlegi->x + 1 >= 0 && jelenlegi->y - 1 <= 7) {
+               if (jobbra_fel_lepes(&tabla[jelenlegi->x + 1][jelenlegi->y - 1], hova, szin)) return 1;
+          }
+     }
+     return 0;
+}
+
+//-------------------------------------------------------------------------------------------------------
 
 //ez a metódus kiírja az aktuális táblát és a navigációkat
 void aktualis_megjelenit(Mezo* m) {
@@ -127,14 +171,14 @@ void atlos_lepes_ellenorzes(Mezo *honnan, Mezo *hova) {
 
      int i = 0;
      int siker = 0;
-     if (helyesxy(honnan->x + 1, honnan->y + 1) == 1) {
+     if (helyesxy(&honnan->x + 1, &honnan->y + 1) == 1) {
           if (tabla[honnan->x + 1][honnan->y + 1].babu == '-' ||
           &tabla[honnan->x + 1][honnan->y + 1] == &tabla[hova->x][hova->y]) {
 
                atlos_lepes_ellenorzes(&tabla[honnan->x + 1][honnan->y + 1], hova);
           }
      }
-     while(helyesxy(honnan->x + i, honnan->y + i) == 1 && tabla[honnan->x + i][honnan->y + i].babu == '-') {
+     while(helyesxy(&honnan->x + i, &honnan->y + i) == 1 && tabla[honnan->x + i][honnan->y + i].babu == '-') {
           ++i;
      }
 }
@@ -203,12 +247,35 @@ void ideiglenesellenoriz(Mezo* honnan, Mezo* hova, char szin) {
                //return 0;
           }
      }
+     
      if (honnan->babu == 'b') {
           if (honnan->szin == 'w') {
-          }
-          if (honnan->szin == 'w') {
+               if (jobbra_fel_lepes(&tabla[honnan->x - 1][honnan->y + 1], hova, szin)) printf("Siekres lepes"); //return 1;
+               if (jobbra_le_lepes(&tabla[honnan->x + 1][honnan->y + 1], hova, szin)) printf("Siekres lepes"); //return 1;
+               if (balra_fel_lepes(&tabla[honnan->x - 1][honnan->y - 1], hova, szin)) printf("Siekres lepes"); //return 1;
+               if (balra_le_lepes(&tabla[honnan->x + 1][honnan->y - 1], hova, szin)) printf("Siekres lepes"); //return 1;
+          }else if (honnan->szin == 'b') {
+               if (jobbra_fel_lepes(&tabla[honnan->x - 1][honnan->y + 1], hova, szin)) printf("Siekres lepes"); //return 1;
+               if (jobbra_le_lepes(&tabla[honnan->x + 1][honnan->y + 1], hova, szin)) printf("Siekres lepes"); //return 1;
+               if (balra_fel_lepes(&tabla[honnan->x - 1][honnan->y - 1], hova, szin)) printf("Siekres lepes"); //return 1;
+               if (balra_le_lepes(&tabla[honnan->x + 1][honnan->y - 1], hova, szin)) printf("Siekres lepes"); //return 1;
+          } else {
+               printf("Sikertelen lepes");
+               //return 0;
           }
      }
+}
+
+//egy bábunak a jobbra felfele átlós lépését ellenőrzi
+int jobbra_fel_lepes(Mezo *jelenlegi, Mezo* hova, char szin) {
+     if (jelenlegi->x >= 0 && jelenlegi->x <= 7 && jelenlegi->y >= 0 && jelenlegi->y <= 7) {
+          if (jelenlegi != hova && jelenlegi->babu != '-') return 0;
+          if (jelenlegi == hova) return 1;
+          if (jelenlegi != hova && jelenlegi->x - 1 >= 0 && jelenlegi->y + 1 <= 7) {
+               if (jobbra_fel_lepes(&tabla[jelenlegi->x - 1][jelenlegi->y + 1], hova, szin)) return 1;
+          }
+     }
+     return 0;
 }
 
 //kettő mezőt megcserél
