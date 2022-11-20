@@ -487,7 +487,7 @@ int sakk_ellenoriz(Mezo* feher, Mezo* fekete) {
 
      //ló lépések
      if (lo_van_e(feher) == 1) return 1; //printf("11sakk van");
-     if (lo_van_e(fekete) == 1) return 1; //printf("12sakk van");
+     if (lo_van_e(fekete) == 1) return 2; //printf("12sakk van");
 
      return 0;
 }
@@ -554,13 +554,8 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
 
      //király lépésének ellenőrzése
      if (honnan->babu == 'k') {
-          if (kiraly_lepes(honnan, hova)) {
-               if (honnan->szin == 'w') feher_kiraly = honnan;
-               else fekete_kiraly = honnan;
-               return 1;
-          }
-
-          return 0;
+          if (kiraly_lepes(honnan, hova)) return 1;
+          else return 0;
      }
 
      return 0;
@@ -568,6 +563,14 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
 
 //kettő mezőt megcserél
 int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
+     int ervenytelenlepes = 0;
+     int kiralylepes = 0;
+     if (honnan->babu == 'k') {
+          kiralylepes = 1;
+          if (honnan->szin = 'w') feher_kiraly = hova;
+          else fekete_kiraly = hova;
+     }
+
      if (honnan->babu == '-' || honnan->szin != szin) return 0; //ha nem a soron lévő játkos lép akkor 0-t ad vissza
      if (hova->szin == szin || lepes_ellenorzes(honnan, hova, szin) == 0) return 2; //ha nem szabályosan lép a játékos 2-t ad vissza
 
@@ -585,7 +588,6 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      hova->babu = ideiglenesbabu;
      hova->szin = ideiglenesszin;
 
-     int ervenytelenlepes = 0;
      int sakke = sakk_ellenoriz(feher_kiraly, fekete_kiraly);
      if (sakke == 1) {
           if (szin == 'w') {
@@ -602,6 +604,11 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      }
 
      if (ervenytelenlepes) {
+          if (kiralylepes) {
+               if (hova->szin = 'w') feher_kiraly = honnan;
+               else fekete_kiraly = honnan;
+          }
+
           hova->babu = honnan->babu;
           hova->szin = honnan->szin;
           honnan->babu = ideiglenesbabu;
