@@ -4,6 +4,7 @@
           "stdio.h": "c",
           "mezo.h": "c",
           "konstansok.h": "c",
-          "lepes.h": "c"
+          "lepes.h": "c",
+          "sakk_ellenoriz.h": "c"
      }
 }

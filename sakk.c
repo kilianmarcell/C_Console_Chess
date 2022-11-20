@@ -360,7 +360,7 @@ int egyenesen_fel_ellenoriz(Mezo* jelenlegi, char szin) {
      if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi->szin == szin) return 0;
           if (jelenlegi->szin != szin && jelenlegi->szin != '-') {
-               if (jelenlegi->babu == 'q' || jelenlegi->babu == 'b') return 1;
+               if (jelenlegi->babu == 'q' || jelenlegi->babu == 'r') return 1;
                else return 0;
           }
           if (jelenlegi->babu == '-' && jelenlegi->x - 1 >= 0) {
@@ -376,7 +376,7 @@ int egyenesen_le_ellenoriz(Mezo* jelenlegi, char szin) {
      if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi->szin == szin) return 0;
           if (jelenlegi->szin != szin && jelenlegi->szin != '-') {
-               if (jelenlegi->babu == 'q' || jelenlegi->babu == 'b') return 1;
+               if (jelenlegi->babu == 'q' || jelenlegi->babu == 'r') return 1;
                else return 0;
           }
           if (jelenlegi->babu == '-' && jelenlegi->x + 1 <= 7) {
@@ -392,7 +392,7 @@ int egyenesen_jobbra_ellenoriz(Mezo* jelenlegi, char szin) {
      if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi->szin == szin) return 0;
           if (jelenlegi->szin != szin && jelenlegi->szin != '-') {
-               if (jelenlegi->babu == 'q' || jelenlegi->babu == 'b') return 1;
+               if (jelenlegi->babu == 'q' || jelenlegi->babu == 'r') return 1;
                else return 0;
           }
           if (jelenlegi->babu == '-' && jelenlegi->y + 1 >= 0) {
@@ -403,12 +403,12 @@ int egyenesen_jobbra_ellenoriz(Mezo* jelenlegi, char szin) {
      return 0;
 }
 
-//elenőrzés, hogy ló lépésben van-e sakk
+//balra
 int egyenesen_balra_ellenoriz(Mezo* jelenlegi, char szin) {
      if (tablan_belul_van_e(jelenlegi->x, jelenlegi->y)) {
           if (jelenlegi->szin == szin) return 0;
           if (jelenlegi->szin != szin && jelenlegi->szin != '-') {
-               if (jelenlegi->babu == 'q' || jelenlegi->babu == 'b') return 1;
+               if (jelenlegi->babu == 'q' || jelenlegi->babu == 'r') return 1;
                else return 0;
           }
           if (jelenlegi->babu == '-' && jelenlegi->y - 1 >= 0) {
@@ -419,7 +419,7 @@ int egyenesen_balra_ellenoriz(Mezo* jelenlegi, char szin) {
      return 0;
 }
 
-//ellenőzi
+//ellenőzi, hogy ló lépésben van-e sakk
 int lo_van_e(Mezo* kiraly) {
      if (tablan_belul_van_e(kiraly->x - 1, kiraly->y + 2)) {
           if (tabla[kiraly->x - 1][kiraly->y + 2].babu == 'h' &&
@@ -457,6 +457,31 @@ int lo_van_e(Mezo* kiraly) {
      return 0;
 }
 
+//ellenőzi, hogy paraszt lépésben van-e sakk
+int paraszt_van_e(Mezo* kiraly) {
+     if (kiraly->szin == 'w') {
+          if (tablan_belul_van_e(kiraly->x - 1, kiraly->y + 1)) {
+               if (tabla[kiraly->x - 1][kiraly->y + 1].babu == 'p' &&
+                    tabla[kiraly->x - 1][kiraly->y + 1].szin == 'b') return 1;
+          }
+          if (tablan_belul_van_e(kiraly->x - 1, kiraly->y - 1)) {
+               if (tabla[kiraly->x - 1][kiraly->y - 1].babu == 'p' &&
+                    tabla[kiraly->x - 1][kiraly->y - 1].szin == 'b') return 1;
+          }
+     } else {
+          if (tablan_belul_van_e(kiraly->x + 1, kiraly->y + 1)) {
+               if (tabla[kiraly->x + 1][kiraly->y - 1].babu == 'p' &&
+                    tabla[kiraly->x + 1][kiraly->y - 1].szin == 'w') return 1;
+          }
+          if (tablan_belul_van_e(kiraly->x + 1, kiraly->y - 1)) {
+               if (tabla[kiraly->x + 1][kiraly->y + 1].babu == 'p' &&
+                    tabla[kiraly->x + 1][kiraly->y + 1].szin == 'w') return 1;
+          }
+     }
+
+     return 0;
+}
+
 //ellenőrzi, hogy sakk van-e
 int sakk_ellenoriz(Mezo* feher, Mezo* fekete) {
      //átlós lépések
@@ -476,18 +501,21 @@ int sakk_ellenoriz(Mezo* feher, Mezo* fekete) {
      if (egyenesen_fel_ellenoriz(&tabla[feher->x - 1][feher->y], 'w')) return 1; //printf("1sakk van");
      if (egyenesen_fel_ellenoriz(&tabla[fekete->x - 1][fekete->y], 'b')) return 2; //printf("2sakk van");
 
-     if (egyenesen_le_ellenoriz(&tabla[feher->x - 1][feher->y + 1], 'w')) return 1; //printf("3sakk van");
-     if (egyenesen_le_ellenoriz(&tabla[fekete->x - 1][fekete->y + 1], 'b')) return 2; //printf("4sakk van");
+     if (egyenesen_le_ellenoriz(&tabla[feher->x + 1][feher->y], 'w')) return 1; //printf("3sakk van");
+     if (egyenesen_le_ellenoriz(&tabla[fekete->x + 1][fekete->y], 'b')) return 2; //printf("4sakk van");
 
-     if (egyenesen_jobbra_ellenoriz(&tabla[feher->x - 1][feher->y + 1], 'w')) return 1; //printf("5sakk van");
-     if (egyenesen_jobbra_ellenoriz(&tabla[fekete->x - 1][fekete->y + 1], 'b')) return 2; //printf("6sakk van");
+     if (egyenesen_jobbra_ellenoriz(&tabla[feher->x][feher->y + 1], 'w')) return 1; //printf("5sakk van");
+     if (egyenesen_jobbra_ellenoriz(&tabla[fekete->x][fekete->y + 1], 'b')) return 2; //printf("6sakk van");
 
-     if (egyenesen_balra_ellenoriz(&tabla[feher->x - 1][feher->y + 1], 'w')) return 1; //printf("7sakk van");
-     if (egyenesen_balra_ellenoriz(&tabla[fekete->x - 1][fekete->y + 1], 'b')) return 2; //printf("8sakk van");
+     if (egyenesen_balra_ellenoriz(&tabla[feher->x][feher->y - 1], 'w')) return 1; //printf("7sakk van");
+     if (egyenesen_balra_ellenoriz(&tabla[fekete->x][fekete->y - 1], 'b')) return 2; //printf("8sakk van");
 
      //ló lépések
      if (lo_van_e(feher) == 1) return 1; //printf("11sakk van");
      if (lo_van_e(fekete) == 1) return 2; //printf("12sakk van");
+
+     if (paraszt_van_e(feher) == 1) return 1; //printf("12sakk van");
+     if (paraszt_van_e(fekete) == 1) return 2; //printf("12sakk van");
 
      return 0;
 }
@@ -554,8 +582,13 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
 
      //király lépésének ellenőrzése
      if (honnan->babu == 'k') {
-          if (kiraly_lepes(honnan, hova)) return 1;
-          else return 0;
+          if (kiraly_lepes(honnan, hova)) {
+               if (honnan->szin == 'w') feher_kiraly = honnan;
+               else fekete_kiraly = honnan;
+               return 1;
+          }
+
+          return 0;
      }
 
      return 0;
@@ -564,31 +597,29 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
 //kettő mezőt megcserél
 int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      int ervenytelenlepes = 0;
-     int kiralylepes = 0;
-     if (honnan->babu == 'k') {
-          kiralylepes = 1;
-          if (honnan->szin = 'w') feher_kiraly = hova;
-          else fekete_kiraly = hova;
-     }
-
+     
      if (honnan->babu == '-' || honnan->szin != szin) return 0; //ha nem a soron lévő játkos lép akkor 0-t ad vissza
      if (hova->szin == szin || lepes_ellenorzes(honnan, hova, szin) == 0) return 2; //ha nem szabályosan lép a játékos 2-t ad vissza
+     if (honnan->babu == 'k') {
+          if (honnan->szin == 'w') feher_kiraly = hova;
+          else fekete_kiraly = hova;
+     }
 
      char ideiglenesbabu = honnan->babu;
      char ideiglenesszin = honnan->szin;
 
-     if (hova->szin != szin || hova->szin != '-') {
-          honnan->babu = '-';
-          honnan->szin = '-';
-     } else {
-          honnan->babu = hova->babu;
-          honnan->szin = hova->szin;
+     if (hova->szin != szin && hova->szin != '-') {
+          hova->babu = '-';
+          hova->szin = '-';
      }
 
+     honnan->babu = hova->babu;
+     honnan->szin = hova->szin;
      hova->babu = ideiglenesbabu;
      hova->szin = ideiglenesszin;
 
      int sakke = sakk_ellenoriz(feher_kiraly, fekete_kiraly);
+     printf("\n%d\n\n", sakke);
      if (sakke == 1) {
           if (szin == 'w') {
                ervenytelenlepes = 1;
@@ -604,15 +635,15 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      }
 
      if (ervenytelenlepes) {
-          if (kiralylepes) {
-               if (hova->szin = 'w') feher_kiraly = honnan;
-               else fekete_kiraly = honnan;
-          }
-
           hova->babu = honnan->babu;
           hova->szin = honnan->szin;
           honnan->babu = ideiglenesbabu;
           honnan->szin = ideiglenesszin;
+          
+          if (honnan->babu == 'k') {
+               if (honnan->szin == 'w') feher_kiraly = honnan;
+               else fekete_kiraly = honnan;
+          }
 
           return 2;
      }
