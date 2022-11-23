@@ -9,7 +9,7 @@ typedef struct Lepes {
      int hova_y;
      char leutott_szin;
      char leutott_babu;
-     struct Lepes *elozo, *kov;
+     struct Lepes *elozo;
 } Lepes;
 
 #endif

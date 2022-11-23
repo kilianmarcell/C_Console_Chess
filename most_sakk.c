@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "mezo.h"
 #include "lepes.h"
 #include "debugmalloc.h"
 
 void menu(int* navigal);
+void *jatek_betolt(int* navigal);
 void hibauzenet(char *uzenet);
 
 //lépéseket ellenőrző metódusok
@@ -34,6 +36,7 @@ int lo_van_e(Mezo* kiraly);
 
 void elozo_lepesek_kiir(Lepes* l, int szamol);
 void tabla_betolt();
+void jatek_mentese();
 
 //-------------------------------------------------------------------------------------------------------
 //Konstansok
@@ -655,7 +658,6 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
           l->leutott_szin = '-';
      }
      l->elozo = lepes;
-     l->kov = NULL;
      
      lepes = l;
 
@@ -663,7 +665,7 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
 }
 
 void elozo_lepesek_kiir(Lepes* l, int szamol) {
-     if (szamol <= 5 && l != NULL) {
+     if (szamol < 5 && l != NULL) {
           elozo_lepesek_kiir(l->elozo, szamol + 1);
           printf("%c%d->%c%d   ", oszlopok[l->honnan_y], 8 - l->honnan_x, oszlopok[l->hova_y], 8 - l->hova_x);
      }
@@ -728,11 +730,8 @@ void uj_jatek() {
      tabla_betolt();
 
      int muvelet, x, y, ellenoriz, hanyadik_lepes = 1;
-     char sor, oszlop, jatekos = 'w';
+     char sor, oszlop, valasz, jatekos = 'w';
      char bemenet[5];
-
-     gets(bemenet);
-     aktualis_megjelenit(&tabla[0][0]);
      while(muvelet != 9) {
           if (jatekos == 'w') printf("Feher");
           else printf("Fekete");
@@ -759,26 +758,28 @@ void uj_jatek() {
                     hibauzenet("bemeneti erteket");
                }
                ++hanyadik_lepes;
-          } else if (sscanf(bemenet, "%d", &muvelet) == 1 && muvelet == 2) {
-               char valasz;
-               if (hanyadik_lepes != 1) {
-                    printf("Biztos vissza akar lépni? (i vagy n): ");
-                    valasz = getchar();
-                    if (valasz == 'i') {
+          } else if (sscanf(bemenet, "%d", &muvelet) == 1) {
+               if (muvelet == 2) {
+                    if (hanyadik_lepes != 1) {
                          visszalepes();
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
                          --hanyadik_lepes;
+                    } else {
+                         aktualis_megjelenit(&tabla[0][0]);
+                         printf("Nem lehet visszalépni!\n\n");
                     }
-               } else {
-                    aktualis_megjelenit(&tabla[0][0]);
-                    printf("Nem lehet visszalépni!\n");
+               } else if (muvelet == 1) {
+                    jatek_mentese();
                }
           } else if (muvelet != 2 && muvelet != 9) {
-          aktualis_megjelenit(&tabla[0][0]);
+               aktualis_megjelenit(&tabla[0][0]);
                hibauzenet("bemeneti erteket");
           }
      }
+     printf("Elmenti a jatekot?: ");
+     valasz = getchar();
+     if (valasz == 'i') jatek_mentese;
      while (lepes != NULL) {
           Lepes *seged = lepes->elozo;
           free(lepes);
@@ -838,8 +839,68 @@ void tabla_betolt() {
      fekete_kiraly = &tabla[0][4];
 }
 
-//betölt egy elmentett sakk játszmát, 
-void jatek_betolt(int* navigal) {
+//menti az aktuális játékot
+void jatek_mentese() {
+     FILE* mentes;
+}
+
+//betölt egy elmentett sakkjátszmát
+void *jatek_betolt(int* navigal) {
+     FILE *jatszma;
+     char jatek[20];
+
+     printf("Melyik játékot szeretné megnyitni?: ");
+     scanf("%s", jatek);
+
+     jatszma = fopen("jatek.txt", "r");
+     if (jatszma == NULL) {
+          printf("Nincs ilyen fájl");
+          menu(navigal);
+     }
+
+     fseek(jatszma, 0, SEEK_END);
+     int length = ftell(jatszma);
+     fseek(jatszma, 0, SEEK_SET); //a fájl elejére visszük vissza a pointert
+
+     char *string = malloc(sizeof(char) * (length + 1));
+
+     char c;
+     int i = 0;
+
+     while ((c = fgetc(jatszma)) != EOF) {
+          string[i] = c;
+          i++;
+     }
+
+     string[i] = '\0';
+     printf("%s", string);
+     // while(*string != '\0') {
+     //      printf("%c ", string);
+     //      string++;
+     // }
+
+     
+     // if (i % 4 == 3) {
+     //      lepes *l;
+     //      l = (lepes*) malloc(sizeof(lepes));
+     //      l->honnan_x = string[i] + 0;
+     //      l->honnan_y = string[i] + 0;
+     //      l->hova_x = string[i] + 0;
+     //      l->hova_y = string[i] + 0;
+
+     //      l->elozo = lepes;
+          
+     //      lepes = l;
+     // }
+
+     // elozo_lepesek_kiir(lepes, 0);
+     // while (lepes != NULL) {
+     //      Lepes *seged = lepes->elozo;
+     //      free(lepes);
+     //      lepes = seged;
+     // }
+     free(string);
+     fclose(jatszma);
 }
 
 //megjeleníti a használati útmutatót, megjeleníti a programmal kapcsolatos tudnivalókat
