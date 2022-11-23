@@ -1,7 +1,15 @@
-//itt adom meg, hogy milyen tulajdonságai vannak egy mezőnek
+#ifndef MEZO_H_INCLUDED
+#define MEZO_H_INCLUDED
+
 typedef struct {
-     int x; //sor
-     int y; //oszlop
-     char babu; //király = k, királynő = q, futó = b, ló = h, bástya = r, paraszt = p
-     char szin; //fehér = w, fekete = b
+     int x;
+     int y;
+     char babu;
+     char szin;
 } Mezo;
+
+extern Mezo tabla[8][8];
+extern Mezo* feher_kiraly;
+extern Mezo* fekete_kiraly;
+
+#endif

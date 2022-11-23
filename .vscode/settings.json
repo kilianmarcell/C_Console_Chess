@@ -5,6 +5,8 @@
           "mezo.h": "c",
           "konstansok.h": "c",
           "lepes.h": "c",
-          "sakk_ellenoriz.h": "c"
+          "sakk_ellenoriz.h": "c",
+          "lepes_ellenorzes_fuggvenyek.h": "c",
+          "konvertalasok.h": "c"
      }
 }
