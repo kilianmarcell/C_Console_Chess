@@ -37,6 +37,7 @@ int lo_van_e(Mezo* kiraly);
 
 void elozo_lepesek_kiir(Lepes* l, int szamol);
 void tabla_betolt();
+void egy_lepes(int* muvelet, int* x, int* y, int* ellenoriz, int* hanyadik_lepes, char* sor, char* oszlop, char* valasz, char* jatekos);
 void jatek_mentese();
 
 //-------------------------------------------------------------------------------------------------------
@@ -734,17 +735,35 @@ void visszalepes() {
 }
 
 //betölt egy sakktáblát, innen kezdődik a játék
-void uj_jatek() {
+void uj_jatek(int betolte) {
      tabla_betolt();
 
      int muvelet, x, y, ellenoriz, hanyadik_lepes = 1;
      char sor, oszlop, valasz, jatekos = 'w';
-     char bemenet[5];
      while(muvelet != 9) {
-          if (jatekos == 'w') printf("Feher");
+          egy_lepes(muvelet, x, y, ellenoriz, hanyadik_lepes, betolte, sor, oszlop, valasz, jatekos);
+     }
+     printf("Elmenti a jatekot?: ");
+     valasz = getchar();
+     if (valasz == 'i') jatek_mentese;
+     while (lepes != NULL) {
+          Lepes *seged = lepes->elozo;
+          free(lepes);
+          lepes = seged;
+     }
+}
+
+//egy lépést valósít meg
+void egy_lepes(int muvelet, int x, int y, int ellenoriz, int hanyadik_lepes, int betolte, char sor, char oszlop, char valasz, char jatekos) {
+     char bemenet[5];
+     if (jatekos == 'w') printf("Feher");
           else printf("Fekete");
           printf(" jatekos: ");
-          gets(bemenet);
+          if (betolte == 0) {
+               gets(bemenet);
+          } else if (betolte == 1) {
+
+          }
           if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
                if (helyesxy(&x, &y) && helyes_sor_oszlop(&sor, &oszlop)) {
                     ellenoriz = pozicio_cserel(&tabla[7 - (x - 1)][betubol_szamra_konvertal(&sor)],
@@ -784,15 +803,6 @@ void uj_jatek() {
                aktualis_megjelenit(&tabla[0][0]);
                hibauzenet("bemeneti erteket");
           }
-     }
-     printf("Elmenti a jatekot?: ");
-     valasz = getchar();
-     if (valasz == 'i') jatek_mentese;
-     while (lepes != NULL) {
-          Lepes *seged = lepes->elozo;
-          free(lepes);
-          lepes = seged;
-     }
 }
 
 //betölt egy üres táblát
@@ -895,14 +905,16 @@ void *jatek_betolt(int* navigal) {
                
                lepes = l;
      }
-     printf("\nEz most: honnan x%d y%d hova x%d y%d\n", lepes->honnan_x, lepes->honnan_y, lepes->hova_x, lepes->hova_y);
+     
      elozo_lepesek_kiir(lepes, 0);
      printf("\n%d", lepes->honnan_x);
+
      while (lepes != NULL) {
           Lepes *seged = lepes->elozo;
           free(lepes);
           lepes = seged;
      }
+
      free(string);
      fclose(jatszma);
 }
@@ -955,7 +967,7 @@ void menu(int* navigal) {
      switch (*navigal) {
           case 1:
                system("cls");
-               uj_jatek();
+               uj_jatek(0);
                break;
           case 2:
                system("cls");
