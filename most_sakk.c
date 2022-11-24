@@ -7,6 +7,7 @@
 void menu(int* navigal);
 void *jatek_betolt(int* navigal);
 void hibauzenet(char *uzenet);
+int karakterbol_szamra_konvertal(char c);
 
 //lépéseket ellenőrző metódusok
 int lo_lepes(Mezo* jelenlegi, Mezo* hova);
@@ -101,6 +102,13 @@ char *baburakonvertal(char betu, char szin) {
 //ellenőrzi, hogy a koordináták a táblán belülre mutatnak-e
 int tablan_belul_van_e(int x, int y) {
      return (x >= 0 && x <= 7 && y >= 0 && y <= 7);
+}
+
+//egy bejövő szám karaktert (char-t) konvertál számra (int) típusúra
+int karakterbol_szamra_konvertal(char c) {
+     int szam = 0;
+     szam = c - '0';
+     return szam;
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -847,12 +855,12 @@ void jatek_mentese() {
 //betölt egy elmentett sakkjátszmát
 void *jatek_betolt(int* navigal) {
      FILE *jatszma;
-     char jatek[20];
+     char jatek[50];
 
      printf("Melyik játékot szeretné megnyitni?: ");
      scanf("%s", jatek);
 
-     jatszma = fopen("jatek.txt", "r");
+     jatszma = fopen(jatek, "r");
      if (jatszma == NULL) {
           printf("Nincs ilyen fájl");
           menu(navigal);
@@ -865,40 +873,36 @@ void *jatek_betolt(int* navigal) {
      char *string = malloc(sizeof(char) * (length + 1));
 
      char c;
-     int i = 0;
+     int szamol = 0;
 
      while ((c = fgetc(jatszma)) != EOF) {
-          string[i] = c;
-          i++;
+          string[szamol] = c;
+          szamol++;
      }
 
-     string[i] = '\0';
-     printf("%s", string);
-     // while(*string != '\0') {
-     //      printf("%c ", string);
-     //      string++;
-     // }
+     string[szamol] = '\0';
+     printf("\n%s\n\n",string);
 
-     
-     // if (i % 4 == 3) {
-     //      lepes *l;
-     //      l = (lepes*) malloc(sizeof(lepes));
-     //      l->honnan_x = string[i] + 0;
-     //      l->honnan_y = string[i] + 0;
-     //      l->hova_x = string[i] + 0;
-     //      l->hova_y = string[i] + 0;
+     for(int i = 4; i <= szamol; i += 5) {
+               Lepes *l;
+               l = (Lepes*) malloc(sizeof(Lepes));
+               l->honnan_x = karakterbol_szamra_konvertal(string[i - 4]);
+               l->honnan_y = karakterbol_szamra_konvertal(string[i - 3]);
+               l->hova_x = karakterbol_szamra_konvertal(string[i - 2]);
+               l->hova_y = karakterbol_szamra_konvertal(string[i - 1]);
 
-     //      l->elozo = lepes;
-          
-     //      lepes = l;
-     // }
-
-     // elozo_lepesek_kiir(lepes, 0);
-     // while (lepes != NULL) {
-     //      Lepes *seged = lepes->elozo;
-     //      free(lepes);
-     //      lepes = seged;
-     // }
+               l->elozo = lepes;
+               
+               lepes = l;
+     }
+     printf("\nEz most: honnan x%d y%d hova x%d y%d\n", lepes->honnan_x, lepes->honnan_y, lepes->hova_x, lepes->hova_y);
+     elozo_lepesek_kiir(lepes, 0);
+     printf("\n%d", lepes->honnan_x);
+     while (lepes != NULL) {
+          Lepes *seged = lepes->elozo;
+          free(lepes);
+          lepes = seged;
+     }
      free(string);
      fclose(jatszma);
 }
