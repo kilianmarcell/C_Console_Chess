@@ -37,7 +37,7 @@ int lo_van_e(Mezo* kiraly);
 
 void elozo_lepesek_kiir(Lepes* l, int szamol);
 void tabla_betolt();
-int egy_lepes(char *betolt_e);
+int egy_lepes(char *betolt_e, int betolt_e_vege);
 void jatek_mentese();
 
 //-------------------------------------------------------------------------------------------------------
@@ -735,18 +735,35 @@ void visszalepes() {
 }
 
 //betölt egy sakktáblát, innen kezdődik a játék
-void uj_jatek() {
+void uj_jatek(int* navigal) {
      tabla_betolt();
-     if (egy_lepes("-") == 0);
+     if (egy_lepes("-", 1) == 1);
+
+     menu(navigal);
+}
+
+//megszámolja és visszaadja az eddigi lépések számát
+int lepesek_megszamolasa(Lepes* l, int ossz) {
+     if (l != NULL) {
+          ++ossz;
+          return lepesek_megszamolasa(l->elozo, ossz);
+     }
+     return ossz;
 }
 
 //egy lépést valósít meg
-int egy_lepes(char* betolt_e) {
-     int muvelet, x, y, ellenoriz, rossz_lepes_e = 0;
-     char sor, oszlop, valasz, jatekos = 'w';
+int egy_lepes(char* betolt_e, int betolt_e_vege) {
+     int muvelet, x, y, ellenoriz;
+     char sor, oszlop, jatekos = 'w';
      char bemenet[5];
      if (betolt_e != "-") {
           strcpy(bemenet, betolt_e);
+     }
+     if (betolt_e_vege == 1) {
+          int lepesekszama = lepesek_megszamolasa(lepes, 0);
+          printf("\nLépések száma: %d\n", lepesekszama);
+          if (lepesekszama % 2 == 0) jatekos = 'w';
+          else jatekos = 'b';
      }
 
      while(muvelet != 9) {
@@ -766,7 +783,7 @@ int egy_lepes(char* betolt_e) {
                               printf("A fekete jatekos kovetkezik!\n");
                          }
                     } else if (ellenoriz == 2) {
-                         if (betolt_e != "-") return 1;
+                         if (betolt_e != "-") return 0;
                          hibauzenet("lepest");
                     } else if (ellenoriz == 1) {
                          if (jatekos == 'w') jatekos = 'b';
@@ -774,11 +791,11 @@ int egy_lepes(char* betolt_e) {
                          aktualis_megjelenit(&tabla[0][0]);
                     }
                } else {
-                    if (betolt_e != "-") return 1;
+                    if (betolt_e != "-") return 0;
                     hibauzenet("bemeneti erteket");
                }
           } else if (sscanf(bemenet, "%d", &muvelet) == 1) {
-               if (betolt_e != "-") return 1;
+               if (betolt_e != "-") return 0;
                if (muvelet == 2) {
                     if (lepes != NULL) {
                          visszalepes();
@@ -792,14 +809,14 @@ int egy_lepes(char* betolt_e) {
                     jatek_mentese();
                }
           } else if (muvelet != 2 && muvelet != 9) {
-               if (betolt_e != "-") return 1;
+               if (betolt_e != "-") return 0;
                aktualis_megjelenit(&tabla[0][0]);
                hibauzenet("bemeneti erteket");
           }
-
-          if (betolt_e != "-") return 0;
      }
+     
      printf("Elmenti a jatekot?: ");
+     char valasz;
      valasz = getchar();
      if (valasz == 'i') jatek_mentese;
      while (lepes != NULL) {
@@ -807,7 +824,8 @@ int egy_lepes(char* betolt_e) {
           free(lepes);
           lepes = seged;
      }
-     return 0;
+
+     return 1;
 }
 
 //betölt egy üres táblát
@@ -896,7 +914,6 @@ void *jatek_betolt(int* navigal) {
      }
 
      beolvasott[szamol] = '\0';
-     printf("\n%s\n\n",beolvasott);
 
      int muvelet, x, y, ellenoriz, rossz_lepes_e = 0, hanyadik_lepes = 1;
      char sor, oszlop, valasz, jatekos = 'w';
@@ -909,9 +926,7 @@ void *jatek_betolt(int* navigal) {
           bemenet[3] = oszlopok[karakterbol_szamra_konvertal(beolvasott[i - 1])];
           bemenet[4] = (8 - karakterbol_szamra_konvertal(beolvasott[i - 2])) + '0';
 
-
-
-          if (egy_lepes(bemenet) == 1) {
+          if (egy_lepes(bemenet, 0) == 0) {
                while (lepes != NULL) {
                     Lepes *seged = lepes->elozo;
                     free(lepes);
@@ -935,15 +950,10 @@ void *jatek_betolt(int* navigal) {
           
           lepes = l;
      }
-
-     while (lepes != NULL) {
-          Lepes *seged = lepes->elozo;
-          free(lepes);
-          lepes = seged;
-     }
-
      free(beolvasott);
      fclose(jatszma);
+     
+     egy_lepes("-", 1);
 }
 
 //megjeleníti a használati útmutatót, megjeleníti a programmal kapcsolatos tudnivalókat
@@ -994,7 +1004,7 @@ void menu(int* navigal) {
      switch (*navigal) {
           case 1:
                system("cls");
-               uj_jatek(0);
+               uj_jatek(navigal);
                break;
           case 2:
                system("cls");
