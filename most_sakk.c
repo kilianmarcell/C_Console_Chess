@@ -753,7 +753,7 @@ int lepesek_megszamolasa(Lepes* l, int ossz) {
 
 //egy lépést valósít meg
 int egy_lepes(char* betolt_e) {
-     int muvelet, x, y, ellenoriz;
+     int muvelet = 0, x, y, ellenoriz;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
      if (betolt_e != "-") {
@@ -762,10 +762,12 @@ int egy_lepes(char* betolt_e) {
      }
 
      while(muvelet != 9) {
-          if (jatekos == 'w') printf("Feher");
-          else printf("Fekete");
-          printf(" jatekos: ");
-          if (betolt_e == "-") gets(bemenet);
+          if (betolt_e == "-") {
+               if (jatekos == 'w') printf("Feher");
+               else printf("Fekete");
+               printf(" jatekos: ");
+               scanf("%s", &bemenet);
+          }
           if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
                if (helyesxy(&x, &y) && helyes_sor_oszlop(&sor, &oszlop)) {
                     ellenoriz = pozicio_cserel(&tabla[7 - (x - 1)][betubol_szamra_konvertal(&sor)],
@@ -803,9 +805,8 @@ int egy_lepes(char* betolt_e) {
                } else if (muvelet == 1) {
                     jatek_mentese();
                }
-          } else if (muvelet != 2 && muvelet != 9) {
+          } else if (muvelet != 2 && muvelet != 9 && sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) != -1) {
                if (betolt_e != "-") return 0;
-               aktualis_megjelenit(&tabla[0][0]);
                hibauzenet("bemeneti erteket");
           }
      }
@@ -928,7 +929,7 @@ void jatek_betolt(int* navigal) {
                }
                free(beolvasott);
                fclose(jatszma);
-               // system("cls");
+               system("cls");
                printf("Hibás lépés van ebben a játszmában!\n");
                menu(navigal);
           }
