@@ -682,7 +682,7 @@ void elozo_lepesek_kiir(Lepes* l, int szamol) {
 
 //megjeleníti az aktuális táblát és a navigációkat
 void aktualis_megjelenit(Mezo* m) {
-     // system("cls");
+     system("cls");
      printf("Utolsó 5 lépés:   ");
      elozo_lepesek_kiir(lepes, 0);
      printf("\n\n    ");
@@ -760,13 +760,15 @@ int egy_lepes(char* betolt_e) {
           strcpy(bemenet, betolt_e);
           if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
      }
+     aktualis_megjelenit(&tabla[0][0]);
 
      while(muvelet != 9) {
           if (betolt_e == "-") {
                if (jatekos == 'w') printf("Feher");
                else printf("Fekete");
                printf(" jatekos: ");
-               scanf("%s", &bemenet);
+               scanf(" %[^\n]s", bemenet);
+               printf("%s", bemenet);
           }
           if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
                if (helyesxy(&x, &y) && helyes_sor_oszlop(&sor, &oszlop)) {
