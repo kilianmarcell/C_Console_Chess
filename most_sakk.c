@@ -35,6 +35,9 @@ int egyenesen_balra_ellenoriz(Mezo* jelenlegi, char szin);
 
 int lo_van_e(Mezo* kiraly);
 
+void paraszt_cserelese(Mezo* m);
+int lepes_visszakovetes();
+
 void elozo_lepesek_kiir(Lepes* l, int szamol);
 int lepesek_megszamolasa(Lepes* l, int ossz);
 void tabla_betolt();
@@ -557,23 +560,43 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
      if (honnan->babu == 'p') {
           if (honnan->szin == 'w') {
                if (honnan->y == hova->y) {
-                    if (honnan->x == hova->x + 1 && hova->babu == '-') return 1;
+                    if (honnan->x == hova->x + 1 && hova->babu == '-') {
+                         if (hova->x == 0) {
+                              return 2; //ha a paraszt beért az ellenfél oldalára
+                         }
+                         return 1;
+                    }
                     else if (honnan->x == 6 && honnan->x == hova->x + 2) return 1;
                     else return 0;
                } else {
                     if (honnan->x == hova->x + 1 && (honnan->y == hova->y - 1 || honnan->y == hova->y + 1 ) &&
-                    hova->szin == ellenkezoszin) return 1;
+                    hova->szin == ellenkezoszin) {
+                         if (hova->x == 0) {
+                              return 2;
+                         }
+                         return 1;
+                    }
                     else return 0;
                }
                //TODO: csere, en passant
           } else if (honnan->szin == 'b') {
                if (honnan->y == hova->y) {
-                    if (honnan->x == hova->x - 1 && hova->babu == '-') return 1;
+                    if (honnan->x == hova->x - 1 && hova->babu == '-') {
+                         if (hova->x == 7) {
+                              return 2;
+                         }
+                         return 1;
+                    }
                     else if (honnan->x == 1 && honnan->x == hova->x - 2) return 1;
                     else return 0;
                } else {
                     if (honnan->x == hova->x - 1 && (honnan->y == hova->y + 1 || honnan->y == hova->y - 1 ) &&
-                    hova->szin == ellenkezoszin) return 1;
+                    hova->szin == ellenkezoszin) {
+                         if (hova->x == 7) {
+                              return 2;
+                         }
+                         return 1;
+                    }
                     else return 0;
                }
                //TODO: csere, en passant
@@ -609,14 +632,36 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
      return 0;
 }
 
+//a paraszt bábu cserélését valósítja meg
+void paraszt_cserelese(Mezo* m) {
+     char melyik = 'a';
+     printf("\nMilyen bábura váltasz? (q = királynő, r = bástya, b = futó, h = ló) ");
+     scanf("%c", &melyik);
+     scanf("%c", &melyik);
+     switch (melyik) {
+     case 'q':
+          m->babu = 'q';
+          break;
+     case 'r':
+          m->babu = 'r';
+          break;
+     case 'b':
+          m->babu = 'b';
+          break;
+     case 'h':
+          m->babu = 'h';
+          break;
+     }
+}
+
 //kettő mezőt megcserél
 int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
-     int ervenytelenlepes = 0;
+     int ervenytelenlepes = 0, lepesellenorzo = lepes_ellenorzes(honnan, hova, szin);
      char ideiglenes_honnan_babu = honnan->babu, ideiglenes_honnan_szin = honnan->szin;
      char ideiglenes_hova_babu = hova->babu, ideiglenes_hova_szin = hova->szin;
      
      if (honnan->babu == '-' || honnan->szin != szin) return 0; //ha nem a soron lévő játkos lép akkor 0-t ad vissza
-     if (hova->szin == szin || lepes_ellenorzes(honnan, hova, szin) == 0) return 2; //ha nem szabályosan lép a játékos 2-t ad vissza
+     if (hova->szin == szin || lepesellenorzo == 0) return 2; //ha nem szabályosan lép a játékos 2-t ad vissza
      if (honnan->babu == 'k') {
           if (honnan->szin == 'w') feher_kiraly = hova;
           else fekete_kiraly = hova;
@@ -650,6 +695,8 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
 
           return 2;
      }
+
+     if (lepesellenorzo == 2) paraszt_cserelese(hova);
      
      Lepes *l;
      l = (Lepes*) malloc(sizeof(Lepes));
@@ -716,11 +763,36 @@ void aktualis_megjelenit(Mezo* m) {
      printf("\n1. Jatek mentese\n2. Visszalepes\n\n9. Kilepes\n\n");
 }
 
+//ez a metódus segí megtalálni, hogy paraszt cserélés volt-e a játszma során
+int lepes_visszakovetes() {
+     Lepes* l_jelenlegi = lepes;
+     Lepes* l_elozo = lepes->elozo;
+     int sor = 0;
+     while (l_elozo != NULL) {
+          if (l_jelenlegi->honnan_x == l_elozo->hova_x && l_jelenlegi->honnan_y == l_elozo->hova_y) {
+               l_jelenlegi = l_elozo;
+               l_elozo = l_elozo->elozo;
+               sor = l_jelenlegi->honnan_x;
+          }
+          l_elozo = l_elozo->elozo;
+     }
+     
+     return sor;
+}
+
 //visszaállítja az előző lépésre a sakktáblát
 void visszalepes() {
      if (tabla[lepes->hova_x][lepes->hova_y].babu == 'k') {
           if (tabla[lepes->hova_x][lepes->hova_y].szin == 'w') feher_kiraly = &tabla[lepes->honnan_x][lepes->honnan_y];
           if (tabla[lepes->hova_x][lepes->hova_y].szin == 'b') fekete_kiraly = &tabla[lepes->honnan_x][lepes->honnan_y];
+     }
+
+     if (lepes->honnan_x == 1 && lepes->hova_x == 0) {
+          if (lepes_visszakovetes() == 6) tabla[lepes->hova_x][lepes->hova_y].babu = 'p';
+     }
+
+     if (lepes->honnan_x == 6 && lepes->hova_x == 7) {
+          if (lepes_visszakovetes() == 1) tabla[lepes->hova_x][lepes->hova_y].babu = 'p';
      }
 
      char ideiglenes_babu = tabla[lepes->honnan_x][lepes->honnan_y].babu;
@@ -765,12 +837,17 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
      int muvelet = 0, x, y, ellenoriz, sakk_e = 0;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
+     aktualis_megjelenit(&tabla[0][0]);
+
+     if (betolt_vege == 1) {
+          if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
+          if (sakk_ellenoriz(feher_kiraly, fekete_kiraly) != 0) sakk_e = 1;
+     }
+
      if (betolt_e != "-") {
           strcpy(bemenet, betolt_e);
           if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
      }
-     aktualis_megjelenit(&tabla[0][0]);
-     if (betolt_vege == 1 && sakk_ellenoriz(feher_kiraly, fekete_kiraly) != 0) sakk_e = 1;
 
      while(muvelet != 9) {
           if (sakk_e == 1) {
