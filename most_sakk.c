@@ -5,7 +5,7 @@
 #include "debugmalloc.h"
 
 void menu(int* navigal);
-void *jatek_betolt(int* navigal);
+void jatek_betolt(int* navigal);
 void hibauzenet(char *uzenet);
 int karakterbol_szamra_konvertal(char c);
 
@@ -37,7 +37,7 @@ int lo_van_e(Mezo* kiraly);
 
 void elozo_lepesek_kiir(Lepes* l, int szamol);
 void tabla_betolt();
-int egy_lepes(char *betolt_e, int betolt_e_vege);
+int egy_lepes(char *betolt_e);
 void jatek_mentese();
 
 //-------------------------------------------------------------------------------------------------------
@@ -682,7 +682,7 @@ void elozo_lepesek_kiir(Lepes* l, int szamol) {
 
 //megjeleníti az aktuális táblát és a navigációkat
 void aktualis_megjelenit(Mezo* m) {
-     system("cls");
+     // system("cls");
      printf("Utolsó 5 lépés:   ");
      elozo_lepesek_kiir(lepes, 0);
      printf("\n\n    ");
@@ -737,7 +737,7 @@ void visszalepes() {
 //betölt egy sakktáblát, innen kezdődik a játék
 void uj_jatek(int* navigal) {
      tabla_betolt();
-     if (egy_lepes("-", 1) == 1);
+     if (egy_lepes("-") == 1);
 
      menu(navigal);
 }
@@ -752,18 +752,13 @@ int lepesek_megszamolasa(Lepes* l, int ossz) {
 }
 
 //egy lépést valósít meg
-int egy_lepes(char* betolt_e, int betolt_e_vege) {
+int egy_lepes(char* betolt_e) {
      int muvelet, x, y, ellenoriz;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
      if (betolt_e != "-") {
           strcpy(bemenet, betolt_e);
-     }
-     if (betolt_e_vege == 1) {
-          int lepesekszama = lepesek_megszamolasa(lepes, 0);
-          printf("\nLépések száma: %d\n", lepesekszama);
-          if (lepesekszama % 2 == 0) jatekos = 'w';
-          else jatekos = 'b';
+          if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
      }
 
      while(muvelet != 9) {
@@ -886,7 +881,7 @@ void jatek_mentese() {
 }
 
 //betölt egy elmentett sakkjátszmát
-void *jatek_betolt(int* navigal) {
+void jatek_betolt(int* navigal) {
      FILE *jatszma;
      char jatek[50];
 
@@ -898,6 +893,8 @@ void *jatek_betolt(int* navigal) {
           printf("Nincs ilyen fájl");
           menu(navigal);
      }
+
+     tabla_betolt();
 
      fseek(jatszma, 0, SEEK_END);
      int length = ftell(jatszma);
@@ -914,19 +911,16 @@ void *jatek_betolt(int* navigal) {
      }
 
      beolvasott[szamol] = '\0';
-
-     int muvelet, x, y, ellenoriz, rossz_lepes_e = 0, hanyadik_lepes = 1;
-     char sor, oszlop, valasz, jatekos = 'w';
      char bemenet[5];
 
      for(int i = 4; i <= szamol; i += 5) {
           bemenet[0] = oszlopok[karakterbol_szamra_konvertal(beolvasott[i - 3])];
           bemenet[1] = (8 - karakterbol_szamra_konvertal(beolvasott[i - 4])) + '0';
-          bemenet[2] = ' ';
-          bemenet[3] = oszlopok[karakterbol_szamra_konvertal(beolvasott[i - 1])];
-          bemenet[4] = (8 - karakterbol_szamra_konvertal(beolvasott[i - 2])) + '0';
+          bemenet[2] = oszlopok[karakterbol_szamra_konvertal(beolvasott[i - 1])];
+          bemenet[3] = (8 - karakterbol_szamra_konvertal(beolvasott[i - 2])) + '0';
+          bemenet[4] = '\0';
 
-          if (egy_lepes(bemenet, 0) == 0) {
+          if (egy_lepes(bemenet) == 0) {
                while (lepes != NULL) {
                     Lepes *seged = lepes->elozo;
                     free(lepes);
@@ -934,26 +928,15 @@ void *jatek_betolt(int* navigal) {
                }
                free(beolvasott);
                fclose(jatszma);
-               system("cls");
-               printf("Hibás lépés van a betöltött játékban!\n");
+               // system("cls");
+               printf("Hibás lépés van ebben a játszmában!\n");
                menu(navigal);
           }
-          
-          Lepes *l;
-          l = (Lepes*) malloc(sizeof(Lepes));
-          l->honnan_x = karakterbol_szamra_konvertal(beolvasott[i - 4]);
-          l->honnan_y = karakterbol_szamra_konvertal(beolvasott[i - 3]);
-          l->hova_x = karakterbol_szamra_konvertal(beolvasott[i - 2]);
-          l->hova_y = karakterbol_szamra_konvertal(beolvasott[i - 1]);
-
-          l->elozo = lepes;
-          
-          lepes = l;
      }
      free(beolvasott);
      fclose(jatszma);
      
-     egy_lepes("-", 1);
+     egy_lepes("-");
 }
 
 //megjeleníti a használati útmutatót, megjeleníti a programmal kapcsolatos tudnivalókat
