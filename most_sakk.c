@@ -36,9 +36,11 @@ int egyenesen_balra_ellenoriz(Mezo* jelenlegi, char szin);
 int lo_van_e(Mezo* kiraly);
 
 void elozo_lepesek_kiir(Lepes* l, int szamol);
+int lepesek_megszamolasa(Lepes* l, int ossz);
 void tabla_betolt();
-int egy_lepes(char *betolt_e);
+int egy_lepes(char *betolt_e, int betolt_vege);
 void jatek_mentese();
+void fajlbair(FILE* mentes, Lepes* lepes);
 
 //-------------------------------------------------------------------------------------------------------
 //Konstansok
@@ -630,14 +632,10 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      hova->babu = ideiglenes_honnan_babu;
      hova->szin = ideiglenes_honnan_szin;
 
+     //sakk ellenőrzése
      int sakke = sakk_ellenoriz(feher_kiraly, fekete_kiraly);
-     if (sakke == 1) {
-          if (szin == 'w') ervenytelenlepes = 1;
-          else printf("\nSakk!\n");
-     } else if (sakke == 2) {
-          if (szin == 'b') ervenytelenlepes = 1;
-          else printf("\nSakk!\n");
-     }
+     if (sakke == 1 && szin == 'w') ervenytelenlepes = 1;
+     else if (sakke == 2 && szin == 'b') ervenytelenlepes = 1;
 
      if (ervenytelenlepes) {
           hova->babu = ideiglenes_hova_babu;
@@ -670,6 +668,9 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      
      lepes = l;
 
+     if (sakke == 1 && szin != 'w') return 3;
+     else if (sakke == 2 && szin != 'b') return 3;
+
      return 1;
 }
 
@@ -683,9 +684,12 @@ void elozo_lepesek_kiir(Lepes* l, int szamol) {
 //megjeleníti az aktuális táblát és a navigációkat
 void aktualis_megjelenit(Mezo* m) {
      system("cls");
-     printf("Utolsó 5 lépés:   ");
-     elozo_lepesek_kiir(lepes, 0);
-     printf("\n\n    ");
+     if (lepesek_megszamolasa(lepes, 0) > 0) {
+          printf("Utolsó 5 lépés:   ");
+          elozo_lepesek_kiir(lepes, 0);
+          printf("\n\n");
+     }
+     printf("    ");
      for (int i = 0; i < 8; i++) {
           printf("%c   ", oszlopok[i]);
      }
@@ -714,6 +718,11 @@ void aktualis_megjelenit(Mezo* m) {
 
 //visszaállítja az előző lépésre a sakktáblát
 void visszalepes() {
+     if (tabla[lepes->hova_x][lepes->hova_y].babu == 'k') {
+          if (tabla[lepes->hova_x][lepes->hova_y].szin == 'w') feher_kiraly = &tabla[lepes->honnan_x][lepes->honnan_y];
+          if (tabla[lepes->hova_x][lepes->hova_y].szin == 'b') fekete_kiraly = &tabla[lepes->honnan_x][lepes->honnan_y];
+     }
+
      char ideiglenes_babu = tabla[lepes->honnan_x][lepes->honnan_y].babu;
      char ideiglenes_szin = tabla[lepes->honnan_x][lepes->honnan_y].babu;
 
@@ -737,9 +746,9 @@ void visszalepes() {
 //betölt egy sakktáblát, innen kezdődik a játék
 void uj_jatek(int* navigal) {
      tabla_betolt();
-     if (egy_lepes("-") == 1);
-
-     menu(navigal);
+     if (egy_lepes("-", 0) == 1) {
+          menu(navigal);
+     }
 }
 
 //megszámolja és visszaadja az eddigi lépések számát
@@ -752,8 +761,8 @@ int lepesek_megszamolasa(Lepes* l, int ossz) {
 }
 
 //egy lépést valósít meg
-int egy_lepes(char* betolt_e) {
-     int muvelet = 0, x, y, ellenoriz;
+int egy_lepes(char* betolt_e, int betolt_vege) {
+     int muvelet = 0, x, y, ellenoriz, sakk_e = 0;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
      if (betolt_e != "-") {
@@ -761,14 +770,19 @@ int egy_lepes(char* betolt_e) {
           if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
      }
      aktualis_megjelenit(&tabla[0][0]);
+     if (betolt_vege == 1 && sakk_ellenoriz(feher_kiraly, fekete_kiraly) != 0) sakk_e = 1;
 
      while(muvelet != 9) {
+          if (sakk_e == 1) {
+               aktualis_megjelenit(&tabla[0][0]);
+               printf("Sakk!\n");
+               sakk_e = 0;
+          }
           if (betolt_e == "-") {
                if (jatekos == 'w') printf("Feher");
                else printf("Fekete");
                printf(" jatekos: ");
                scanf(" %[^\n]s", bemenet);
-               printf("%s", bemenet);
           }
           if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
                if (helyesxy(&x, &y) && helyes_sor_oszlop(&sor, &oszlop)) {
@@ -788,6 +802,10 @@ int egy_lepes(char* betolt_e) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
                          aktualis_megjelenit(&tabla[0][0]);
+                    } else if (ellenoriz == 3) {
+                         if (jatekos == 'w') jatekos = 'b';
+                         else jatekos = 'w';
+                         sakk_e = 1;
                     }
                } else {
                     if (betolt_e != "-") return 0;
@@ -798,8 +816,16 @@ int egy_lepes(char* betolt_e) {
                if (muvelet == 2) {
                     if (lepes != NULL) {
                          visszalepes();
+
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
+                         
+                         if (sakk_ellenoriz(feher_kiraly, fekete_kiraly) != 0) {
+                              sakk_e = 1;
+                              printf("Sakk e=%d\n", sakk_ellenoriz(feher_kiraly, fekete_kiraly));
+                         } else {
+                              sakk_e = 0;
+                         }
                     } else {
                          aktualis_megjelenit(&tabla[0][0]);
                          printf("Nem lehet visszalépni!\n\n");
@@ -815,8 +841,9 @@ int egy_lepes(char* betolt_e) {
      
      printf("Elmenti a jatekot?: ");
      char valasz;
-     valasz = getchar();
-     if (valasz == 'i') jatek_mentese;
+     scanf("%c", valasz);
+     if (valasz == 'i') jatek_mentese();
+     
      while (lepes != NULL) {
           Lepes *seged = lepes->elozo;
           free(lepes);
@@ -880,7 +907,29 @@ void tabla_betolt() {
 
 //menti az aktuális játékot
 void jatek_mentese() {
-     FILE* mentes;
+     printf("Hova szeretné menteni a játszmát? ");
+     char jatek[50];
+     scanf(" %[^\n]s", jatek);
+
+     FILE *mentes = fopen(jatek, "w");
+     if (mentes == NULL) {
+          printf("Sikertelen mentés.");
+     }
+     
+     fajlbair(mentes, lepes);
+
+     fclose(mentes);
+}
+
+//helyes sorrendben menti el a lépéseket
+void fajlbair(FILE* mentes, Lepes* lepes) {
+     if (lepes->elozo != NULL) fajlbair(mentes, lepes->elozo);
+
+     fputc(lepes->honnan_x + '0', mentes);
+     fputc(lepes->honnan_y + '0', mentes);
+     fputc(lepes->hova_x + '0', mentes);
+     fputc(lepes->hova_y + '0', mentes);
+     fputc('\n', mentes);
 }
 
 //betölt egy elmentett sakkjátszmát
@@ -923,7 +972,7 @@ void jatek_betolt(int* navigal) {
           bemenet[3] = (8 - karakterbol_szamra_konvertal(beolvasott[i - 2])) + '0';
           bemenet[4] = '\0';
 
-          if (egy_lepes(bemenet) == 0) {
+          if (egy_lepes(bemenet, 0) == 0) {
                while (lepes != NULL) {
                     Lepes *seged = lepes->elozo;
                     free(lepes);
@@ -939,7 +988,7 @@ void jatek_betolt(int* navigal) {
      free(beolvasott);
      fclose(jatszma);
      
-     egy_lepes("-");
+     egy_lepes("-", 1);
 }
 
 //megjeleníti a használati útmutatót, megjeleníti a programmal kapcsolatos tudnivalókat
