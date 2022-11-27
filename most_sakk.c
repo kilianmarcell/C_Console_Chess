@@ -35,6 +35,8 @@ int egyenesen_balra_ellenoriz(Mezo* jelenlegi, char szin);
 
 int lo_van_e(Mezo* kiraly);
 
+int oda_tud_e_lepni_seged(Mezo* m, char szin);
+int kiraly_tud_e_lepni(Mezo* m);
 int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin);
 void paraszt_cserelese(Mezo* m);
 int volt_e_paraszt_csere();
@@ -504,37 +506,56 @@ int paraszt_van_e(Mezo* kiraly) {
 //ellenőrzi, hogy sakk van-e
 int sakk_ellenoriz(Mezo* feher, Mezo* fekete) {
      //átlós lépések
-     if (jobbra_fel_ellenoriz(&tabla[feher->x - 1][feher->y + 1], 'w')) return 1; //printf("sakk van1");
-     if (jobbra_fel_ellenoriz(&tabla[fekete->x - 1][fekete->y + 1], 'b')) return 2; //printf("sakk van2");
+     if (jobbra_fel_ellenoriz(&tabla[feher->x - 1][feher->y + 1], 'w')) return 1;
+     if (jobbra_fel_ellenoriz(&tabla[fekete->x - 1][fekete->y + 1], 'b')) return 2;
 
-     if (jobbra_le_ellenoriz(&tabla[feher->x + 1][feher->y + 1], 'w')) return 1; //printf("sakk van3");
-     if (jobbra_le_ellenoriz(&tabla[fekete->x + 1][fekete->y + 1], 'b')) return 2; //printf("sakk van4");
+     if (jobbra_le_ellenoriz(&tabla[feher->x + 1][feher->y + 1], 'w')) return 1;
+     if (jobbra_le_ellenoriz(&tabla[fekete->x + 1][fekete->y + 1], 'b')) return 2;
 
-     if (balra_fel_ellenoriz(&tabla[feher->x - 1][feher->y - 1], 'w')) return 1; //printf("sakk van5");
-     if (balra_fel_ellenoriz(&tabla[fekete->x - 1][fekete->y - 1], 'b')) return 2; //printf("sakk van6");
+     if (balra_fel_ellenoriz(&tabla[feher->x - 1][feher->y - 1], 'w')) return 1;
+     if (balra_fel_ellenoriz(&tabla[fekete->x - 1][fekete->y - 1], 'b')) return 2;
 
-     if (balra_le_ellenoriz(&tabla[feher->x + 1][feher->y - 1], 'w')) return 1; //printf("sakk van7");
-     if (balra_le_ellenoriz(&tabla[fekete->x + 1][fekete->y - 1], 'b')) return 2; //printf("sakk van8");
+     if (balra_le_ellenoriz(&tabla[feher->x + 1][feher->y - 1], 'w')) return 1;
+     if (balra_le_ellenoriz(&tabla[fekete->x + 1][fekete->y - 1], 'b')) return 2;
 
      //egyenes lépések
-     if (egyenesen_fel_ellenoriz(&tabla[feher->x - 1][feher->y], 'w')) return 1; //printf("1sakk van");
-     if (egyenesen_fel_ellenoriz(&tabla[fekete->x - 1][fekete->y], 'b')) return 2; //printf("2sakk van");
+     if (egyenesen_fel_ellenoriz(&tabla[feher->x - 1][feher->y], 'w')) return 1;
+     if (egyenesen_fel_ellenoriz(&tabla[fekete->x - 1][fekete->y], 'b')) return 2;
 
-     if (egyenesen_le_ellenoriz(&tabla[feher->x + 1][feher->y], 'w')) return 1; //printf("3sakk van");
-     if (egyenesen_le_ellenoriz(&tabla[fekete->x + 1][fekete->y], 'b')) return 2; //printf("4sakk van");
+     if (egyenesen_le_ellenoriz(&tabla[feher->x + 1][feher->y], 'w')) return 1;
+     if (egyenesen_le_ellenoriz(&tabla[fekete->x + 1][fekete->y], 'b')) return 2;
 
-     if (egyenesen_jobbra_ellenoriz(&tabla[feher->x][feher->y + 1], 'w')) return 1; //printf("5sakk van");
-     if (egyenesen_jobbra_ellenoriz(&tabla[fekete->x][fekete->y + 1], 'b')) return 2; //printf("6sakk van");
+     if (egyenesen_jobbra_ellenoriz(&tabla[feher->x][feher->y + 1], 'w')) return 1;
+     if (egyenesen_jobbra_ellenoriz(&tabla[fekete->x][fekete->y + 1], 'b')) return 2;
 
-     if (egyenesen_balra_ellenoriz(&tabla[feher->x][feher->y - 1], 'w')) return 1; //printf("7sakk van");
-     if (egyenesen_balra_ellenoriz(&tabla[fekete->x][fekete->y - 1], 'b')) return 2; //printf("8sakk van");
+     if (egyenesen_balra_ellenoriz(&tabla[feher->x][feher->y - 1], 'w')) return 1;
+     if (egyenesen_balra_ellenoriz(&tabla[fekete->x][fekete->y - 1], 'b')) return 2;
 
      //ló lépések
-     if (lo_van_e(feher) == 1) return 1; //printf("11sakk van");
-     if (lo_van_e(fekete) == 1) return 2; //printf("12sakk van");
+     if (lo_van_e(feher) == 1) return 1;
+     if (lo_van_e(fekete) == 1) return 2;
 
-     if (paraszt_van_e(feher) == 1) return 1; //printf("12sakk van");
-     if (paraszt_van_e(fekete) == 1) return 2; //printf("12sakk van");
+     //paraszt lépések
+     if (paraszt_van_e(feher) == 1) return 1;
+     if (paraszt_van_e(fekete) == 1) return 2;
+
+     return 0;
+}
+
+int oda_tud_e_lepni_seged(Mezo* m, char szin) {
+     if (jobbra_fel_ellenoriz(&tabla[m->x - 1][m->y + 1], szin)) return 1;
+     if (jobbra_le_ellenoriz(&tabla[m->x + 1][m->y + 1], szin)) return 1;
+     if (balra_fel_ellenoriz(&tabla[m->x - 1][m->y - 1], szin)) return 1;
+     if (balra_le_ellenoriz(&tabla[m->x + 1][m->y - 1], szin)) return 1;
+
+     if (egyenesen_fel_ellenoriz(&tabla[m->x - 1][m->y], szin)) return 1;
+     if (egyenesen_le_ellenoriz(&tabla[m->x + 1][m->y], szin)) return 1;
+     if (egyenesen_jobbra_ellenoriz(&tabla[m->x][m->y + 1], szin)) return 1;
+     if (egyenesen_balra_ellenoriz(&tabla[m->x][m->y - 1], szin)) return 1;
+
+     if (lo_van_e(m) == 1) return 1;
+
+     if (paraszt_van_e(m) == 1) return 1;
 
      return 0;
 }
@@ -682,6 +703,43 @@ void paraszt_cserelese(Mezo* m) {
      }
 }
 
+int kiraly_tud_e_lepni(Mezo* m) {
+     if (tablan_belul_van_e(m->x - 1, m->y)) {
+          if (tabla[m->x - 1][m->y].szin != m->szin &&
+          oda_tud_e_lepni_seged(&tabla[m->x - 1][m->y], (m->szin == 'w') ? 'b' : 'w') == 0) return 1;
+     }
+     if (tablan_belul_van_e(m->x - 1, m->y + 1)) {
+          if (tabla[m->x - 1][m->y + 1].szin != m->szin &&
+          oda_tud_e_lepni_seged(&tabla[m->x - 1][m->y + 1], (m->szin == 'w') ? 'b' : 'w') == 0) return 1;
+     }
+     if (tablan_belul_van_e(m->x, m->y + 1)) {
+          if (tabla[m->x][m->y + 1].szin != m->szin &&
+          oda_tud_e_lepni_seged(&tabla[m->x][m->y + 1], (m->szin == 'w') ? 'b' : 'w') == 0) return 1;
+     }
+     if (tablan_belul_van_e(m->x + 1, m->y + 1)) {
+          if (tabla[m->x + 1][m->y + 1].szin != m->szin &&
+          oda_tud_e_lepni_seged(&tabla[m->x + 1][m->y + 1], (m->szin == 'w') ? 'b' : 'w') == 0) return 1;
+     }
+     if (tablan_belul_van_e(m->x + 1, m->y)) {
+          if (tabla[m->x + 1][m->y].szin != m->szin &&
+          oda_tud_e_lepni_seged(&tabla[m->x + 1][m->y], (m->szin == 'w') ? 'b' : 'w') == 0) return 1;
+     }
+     if (tablan_belul_van_e(m->x + 1, m->y - 1)) {
+          if (tabla[m->x + 1][m->y - 1].szin != m->szin &&
+          oda_tud_e_lepni_seged(&tabla[m->x + 1][m->y - 1], (m->szin == 'w') ? 'b' : 'w') == 0) return 1;
+     }
+     if (tablan_belul_van_e(m->x, m->y - 1)) {
+          if (tabla[m->x][m->y - 1].szin != m->szin &&
+          oda_tud_e_lepni_seged(&tabla[m->x][m->y - 1], (m->szin == 'w') ? 'b' : 'w') == 0) return 1;
+     }
+     if (tablan_belul_van_e(m->x - 1, m->y - 1)) {
+          if (tabla[m->x - 1][m->y - 1].szin != m->szin &&
+          oda_tud_e_lepni_seged(&tabla[m->x - 1][m->y - 1], (m->szin == 'w') ? 'b' : 'w') == 0) return 1;
+     }
+
+     return 0;
+}
+
 //kettő mezőt megcserél
 int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      int ervenytelenlepes = 0, lepesellenorzo = lepes_ellenorzes(honnan, hova, szin);
@@ -707,6 +765,252 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
 
      //sakk ellenőrzése
      int sakke = sakk_ellenoriz(feher_kiraly, fekete_kiraly);
+     if (sakke == 1) {
+          int matt_e = 0;
+
+          if (kiraly_tud_e_lepni(feher_kiraly) == 0) {
+               //átlós lépések
+               if (jobbra_fel_ellenoriz(&tabla[feher_kiraly->x - 1][feher_kiraly->y + 1], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x - 1][feher_kiraly->y + 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x - 1 >= 0 && seged->y + 1 <= 7) seged = &tabla[seged->x - 1][seged->y + 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+               
+               if (jobbra_le_ellenoriz(&tabla[feher_kiraly->x + 1][feher_kiraly->y + 1], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x + 1][feher_kiraly->y + 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x + 1 <= 7 && seged->y + 1 <= 7) seged = &tabla[seged->x + 1][seged->y + 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (balra_fel_ellenoriz(&tabla[feher_kiraly->x - 1][feher_kiraly->y - 1], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x - 1][feher_kiraly->y - 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x - 1 >= 0 && seged->y - 1 >= 0) seged = &tabla[seged->x - 1][seged->y - 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (balra_le_ellenoriz(&tabla[feher_kiraly->x + 1][feher_kiraly->y - 1], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x + 1][feher_kiraly->y - 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x + 1 <= 7 && seged->y - 1 >= 0) seged = &tabla[seged->x + 1][seged->y - 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               //egyenes lépések
+               if (egyenesen_fel_ellenoriz(&tabla[feher_kiraly->x - 1][feher_kiraly->y], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x - 1][feher_kiraly->y];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x - 1 >= 0) seged = &tabla[seged->x - 1][seged->y];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (egyenesen_le_ellenoriz(&tabla[feher_kiraly->x + 1][feher_kiraly->y], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x + 1][feher_kiraly->y];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x + 1 <= 7) seged = &tabla[seged->x + 1][seged->y];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (egyenesen_jobbra_ellenoriz(&tabla[feher_kiraly->x][feher_kiraly->y + 1], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x][feher_kiraly->y + 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->y + 1 <= 7) seged = &tabla[seged->x][seged->y + 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (egyenesen_balra_ellenoriz(&tabla[feher_kiraly->x][feher_kiraly->y - 1], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x][feher_kiraly->y - 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->y - 1 >= 0) seged = &tabla[seged->x][seged->y - 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               //ló lépések
+               if (lo_van_e(feher_kiraly) == 1) {
+                    if (tablan_belul_van_e(feher_kiraly->x - 1, feher_kiraly->y + 2)) {
+                         if (tabla[feher_kiraly->x - 1][feher_kiraly->y + 2].babu == 'h' &&
+                              tabla[feher_kiraly->x - 1][feher_kiraly->y + 2].szin != feher_kiraly->szin &&
+                              oda_tud_e_lepni_seged(&tabla[feher_kiraly->x - 1][feher_kiraly->y + 2], 'b') == 0) matt_e = 1;
+                    }
+                    if (tablan_belul_van_e(feher_kiraly->x - 1, feher_kiraly->y - 2)) {
+                         if (tabla[feher_kiraly->x - 1][feher_kiraly->y - 2].babu == 'h' &&
+                              tabla[feher_kiraly->x - 1][feher_kiraly->y - 2].szin != feher_kiraly->szin &&
+                              oda_tud_e_lepni_seged(&tabla[feher_kiraly->x - 1][feher_kiraly->y - 2], 'b') == 0) matt_e = 1;
+                    }
+                    if (tablan_belul_van_e(feher_kiraly->x - 2, feher_kiraly->y + 1)) {
+                         if (tabla[feher_kiraly->x - 2][feher_kiraly->y + 1].babu == 'h' &&
+                              tabla[feher_kiraly->x - 2][feher_kiraly->y + 1].szin != feher_kiraly->szin &&
+                              oda_tud_e_lepni_seged(&tabla[feher_kiraly->x - 2][feher_kiraly->y + 1], 'b') == 0) matt_e = 1;
+                    }
+                    if (tablan_belul_van_e(feher_kiraly->x - 2, feher_kiraly->y - 1)) {
+                         if (tabla[feher_kiraly->x - 2][feher_kiraly->y - 1].babu == 'h' &&
+                              tabla[feher_kiraly->x - 2][feher_kiraly->y - 1].szin != feher_kiraly->szin &&
+                              oda_tud_e_lepni_seged(&tabla[feher_kiraly->x - 2][feher_kiraly->y - 1], 'b') == 0) matt_e = 1;
+                    }
+                    if (tablan_belul_van_e(feher_kiraly->x + 1, feher_kiraly->y + 2)) {
+                         if (tabla[feher_kiraly->x + 1][feher_kiraly->y + 2].babu == 'h' &&
+                              tabla[feher_kiraly->x + 1][feher_kiraly->y + 2].szin != feher_kiraly->szin &&
+                              oda_tud_e_lepni_seged(&tabla[feher_kiraly->x + 1][feher_kiraly->y + 2], 'b') == 0) matt_e = 1;
+                    }
+                    if (tablan_belul_van_e(feher_kiraly->x + 1, feher_kiraly->y - 2)) {
+                         if (tabla[feher_kiraly->x + 1][feher_kiraly->y - 2].babu == 'h' &&
+                              tabla[feher_kiraly->x + 1][feher_kiraly->y - 2].szin != feher_kiraly->szin &&
+                              oda_tud_e_lepni_seged(&tabla[feher_kiraly->x + 1][feher_kiraly->y - 2], 'b') == 0) matt_e = 1;
+                    }
+                    if (tablan_belul_van_e(feher_kiraly->x + 2, feher_kiraly->y + 1)) {
+                         if (tabla[feher_kiraly->x + 2][feher_kiraly->y + 1].babu == 'h' &&
+                              tabla[feher_kiraly->x + 2][feher_kiraly->y + 1].szin != feher_kiraly->szin &&
+                              oda_tud_e_lepni_seged(&tabla[feher_kiraly->x + 2][feher_kiraly->y + 1], 'b') == 0) matt_e = 1;
+                    }
+                    if (tablan_belul_van_e(feher_kiraly->x + 2, feher_kiraly->y - 1)) {
+                         if (tabla[feher_kiraly->x + 2][feher_kiraly->y - 1].babu == 'h' &&
+                              tabla[feher_kiraly->x + 2][feher_kiraly->y - 1].szin != feher_kiraly->szin &&
+                              oda_tud_e_lepni_seged(&tabla[feher_kiraly->x + 2][feher_kiraly->y - 1], 'b') == 0) matt_e = 1;
+                    }
+               }
+
+               if (paraszt_van_e(feher_kiraly) == 1) {
+                    if (tabla[feher_kiraly->x - 1][feher_kiraly->y + 1].babu == 'p' &&
+                         tabla[feher_kiraly->x - 1][feher_kiraly->y + 1].szin == 'b'&&
+                         oda_tud_e_lepni_seged(&tabla[feher_kiraly->x - 1][feher_kiraly->y + 1], 'b') == 0) matt_e = 1;
+                    if (tabla[feher_kiraly->x - 1][feher_kiraly->y - 1].babu == 'p' &&
+                         tabla[feher_kiraly->x - 1][feher_kiraly->y - 1].szin == 'b' &&
+                         oda_tud_e_lepni_seged(&tabla[feher_kiraly->x - 1][feher_kiraly->y - 1], 'b') == 0) matt_e = 1;
+               }
+          }
+          
+          if (matt_e == 1) return 4;
+     } else if (sakke == 2) {
+          int matt_e = 0;
+
+          if (kiraly_tud_e_lepni(feher_kiraly) == 0) {
+               //átlós lépések
+               if (jobbra_fel_ellenoriz(&tabla[fekete_kiraly->x - 1][fekete_kiraly->y + 1], 'b')) {
+                    Mezo* seged = &tabla[fekete_kiraly->x - 1][fekete_kiraly->y + 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'w')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x - 1 >= 0 && seged->y + 1 <= 7) seged = &tabla[seged->x - 1][seged->y + 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+               
+               if (jobbra_le_ellenoriz(&tabla[fekete_kiraly->x + 1][fekete_kiraly->y + 1], 'b')) {
+                    Mezo* seged = &tabla[fekete_kiraly->x + 1][fekete_kiraly->y + 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'w')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x + 1 <= 7 && seged->y + 1 <= 7) seged = &tabla[seged->x + 1][seged->y + 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (balra_fel_ellenoriz(&tabla[fekete_kiraly->x - 1][fekete_kiraly->y - 1], 'b')) {
+                    Mezo* seged = &tabla[fekete_kiraly->x - 1][fekete_kiraly->y - 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'w')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x - 1 >= 0 && seged->y - 1 >= 0) seged = &tabla[seged->x - 1][seged->y - 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (balra_le_ellenoriz(&tabla[fekete_kiraly->x + 1][fekete_kiraly->y - 1], 'b')) {
+                    Mezo* seged = &tabla[fekete_kiraly->x + 1][fekete_kiraly->y - 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'w')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x + 1 <= 7 && seged->y - 1 >= 0) seged = &tabla[seged->x + 1][seged->y - 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               //egyenes lépések
+               if (egyenesen_fel_ellenoriz(&tabla[feher_kiraly->x - 1][feher_kiraly->y], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x - 1][feher_kiraly->y];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x - 1 >= 0) seged = &tabla[seged->x - 1][seged->y];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+               
+               if (egyenesen_le_ellenoriz(&tabla[feher_kiraly->x + 1][feher_kiraly->y], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x + 1][feher_kiraly->y];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->x + 1 <= 7) seged = &tabla[seged->x + 1][seged->y];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (egyenesen_jobbra_ellenoriz(&tabla[feher_kiraly->x][feher_kiraly->y + 1], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x][feher_kiraly->y + 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->y + 1 <= 7) seged = &tabla[seged->x][seged->y + 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+
+               if (egyenesen_balra_ellenoriz(&tabla[feher_kiraly->x][feher_kiraly->y - 1], 'w')) {
+                    Mezo* seged = &tabla[feher_kiraly->x][feher_kiraly->y - 1];
+                    int vege = 0, kell_e_tovabb_ellenorizni = 1;
+                    while (vege != 1 && kell_e_tovabb_ellenorizni != 0) {
+                         if (oda_tud_e_lepni_seged(&tabla[seged->x][seged->y], 'b')) kell_e_tovabb_ellenorizni = 0;
+                         else if (seged->babu == '-' && seged->y - 1 >= 0) seged = &tabla[seged->x][seged->y - 1];
+                         else vege = 1;
+                    }
+                    if (kell_e_tovabb_ellenorizni == 1) matt_e = 1;
+               }
+          }
+
+          if (matt_e == 1) return 4;
+     }
      if (sakke == 1 && szin == 'w') ervenytelenlepes = 1;
      else if (sakke == 2 && szin == 'b') ervenytelenlepes = 1;
 
@@ -775,7 +1079,7 @@ void elozo_lepesek_kiir(Lepes* l, int szamol) {
 
 //megjeleníti az aktuális táblát és a navigációkat
 void aktualis_megjelenit(Mezo* m) {
-     system("cls");
+     // system("cls");
      if (lepesek_megszamolasa(lepes, 0) > 0) {
           printf("Utolsó 5 lépés:   ");
           elozo_lepesek_kiir(lepes, 0);
@@ -910,25 +1214,25 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
      int muvelet = 0, x, y, ellenoriz, sakk_e = 0;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
-     if (betolt_e == "-") aktualis_megjelenit(&tabla[0][0]);
+     if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
 
      if (betolt_vege == 1) {
           if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
           if (sakk_ellenoriz(feher_kiraly, fekete_kiraly) != 0) sakk_e = 1;
      }
 
-     if (betolt_e != "-") {
+     if (strcmp(betolt_e, "-") == 1) {
           strcpy(bemenet, betolt_e);
           if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
      }
 
      while(muvelet != 9) {
           if (sakk_e == 1) {
-               if (betolt_e == "-") aktualis_megjelenit(&tabla[0][0]);
+               if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
                printf("Sakk!\n");
                sakk_e = 0;
           }
-          if (betolt_e == "-") {
+          if (strcmp(betolt_e, "-") == 0) {
                if (jatekos == 'w') printf("Feher");
                else printf("Fekete");
                printf(" jatekos: ");
@@ -939,30 +1243,34 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
                     ellenoriz = pozicio_cserel(&tabla[7 - (x - 1)][betubol_szamra_konvertal(&sor)],
                          &tabla[7 - (y - 1)][betubol_szamra_konvertal(&oszlop)], jatekos);
                     if (ellenoriz == 0) {
-                         if (betolt_e != "-") return 1;
+                         if (strcmp(betolt_e, "-") == 1) return 1;
                          if (jatekos == 'w') {
                               printf("A feher jatekos kovetkezik!\n");
                          } else if (jatekos == 'b') {
                               printf("A fekete jatekos kovetkezik!\n");
                          }
                     } else if (ellenoriz == 2) {
-                         if (betolt_e != "-") return 0;
+                         if (strcmp(betolt_e, "-") == 1) return 0;
                          hibauzenet("lepest");
                     } else if (ellenoriz == 1) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
-                         if (betolt_e == "-") aktualis_megjelenit(&tabla[0][0]);
+                         if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
                     } else if (ellenoriz == 3) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
                          sakk_e = 1;
+                    } else if (ellenoriz == 4) {
+                         printf("\nSakk matt!\n");
+                         (jatekos == 'w') ? printf("Fehér játékos nyert!") : printf("Fekete játékos nyert");
+                         muvelet = 9;
                     }
                } else {
-                    if (betolt_e != "-") return 0;
+                    if (strcmp(betolt_e, "-") == 1) return 0;
                     hibauzenet("bemeneti erteket");
                }
           } else if (sscanf(bemenet, "%d", &muvelet) == 1) {
-               if (betolt_e != "-") return 0;
+               if (strcmp(betolt_e, "-") == 1) return 0;
                if (muvelet == 2) {
                     if (lepes != NULL) {
                          visszalepes();
@@ -984,14 +1292,14 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
                     jatek_mentese();
                }
           } else if (muvelet != 2 && muvelet != 9 && sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) != -1) {
-               if (betolt_e != "-") return 0;
+               if (strcmp(betolt_e, "-") == 1) return 0;
                hibauzenet("bemeneti erteket");
           }
      }
      
      printf("Elmenti a jatekot?: ");
      char valasz;
-     scanf("%c", valasz);
+     scanf("%c", &valasz);
      if (valasz == 'i') jatek_mentese();
      
      while (lepes != NULL) {
