@@ -36,7 +36,7 @@ int egyenesen_balra_ellenoriz(Mezo* jelenlegi, char szin);
 int lo_van_e(Mezo* kiraly);
 
 void paraszt_cserelese(Mezo* m);
-int lepes_visszakovetes();
+int volt_e_paraszt_csere();
 
 void elozo_lepesek_kiir(Lepes* l, int szamol);
 int lepesek_megszamolasa(Lepes* l, int ossz);
@@ -566,42 +566,49 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
                          }
                          return 1;
                     }
-                    else if (honnan->x == 6 && honnan->x == hova->x + 2) return 1;
+                    else if (honnan->x == 6 && honnan->x == hova->x + 2 && tabla[hova->x][hova->y].babu == '-') return 1;
                     else return 0;
-               } else {
-                    if (honnan->x == hova->x + 1 && (honnan->y == hova->y - 1 || honnan->y == hova->y + 1 ) &&
-                    hova->szin == ellenkezoszin) {
-                         if (hova->x == 0) {
-                              return 2;
-                         }
-                         return 1;
+               } else if (honnan->x == hova->x + 1 && (honnan->y == hova->y + 1 || honnan->y == hova->y - 1)) {
+                    if (hova->szin == ellenkezoszin) return 1;
+                    if (hova->x == 0) {
+                         return 2;
                     }
-                    else return 0;
+                    if (lepes->honnan_x == 1 && lepes->hova_x == 3 && lepes->hova_y == hova->y &&
+                    tabla[lepes->hova_x][lepes->hova_y].babu == 'p') {
+                         if (honnan->x == 3 && tabla[3][hova->y].babu == 'p' &&
+                         tabla[3][hova->y].szin == ellenkezoszin) {
+                              tabla[3][hova->y].szin = '-';
+                              tabla[3][hova->y].babu = '-';
+                              return 4; //en passant
+                         }
+                    }
                }
-               //TODO: csere, en passant
           } else if (honnan->szin == 'b') {
                if (honnan->y == hova->y) {
                     if (honnan->x == hova->x - 1 && hova->babu == '-') {
                          if (hova->x == 7) {
-                              return 2;
+                              return 2; //ha a paraszt beért az ellenfél oldalára
                          }
                          return 1;
                     }
-                    else if (honnan->x == 1 && honnan->x == hova->x - 2) return 1;
+                    else if (honnan->x == 1 && honnan->x == hova->x - 2 && tabla[hova->x][hova->y].babu == '-') return 1;
                     else return 0;
-               } else {
-                    if (honnan->x == hova->x - 1 && (honnan->y == hova->y + 1 || honnan->y == hova->y - 1 ) &&
-                    hova->szin == ellenkezoszin) {
-                         if (hova->x == 7) {
-                              return 2;
-                         }
-                         return 1;
+               } else if (honnan->x == hova->x - 1 && (honnan->y == hova->y + 1 || honnan->y == hova->y - 1)) {
+                    if (hova->szin == ellenkezoszin) return 1;
+                    if (hova->x == 7) {
+                         return 2;
                     }
-                    else return 0;
+                    if (lepes->honnan_x == 6 && lepes->hova_x == 4 && lepes->hova_y == hova->y &&
+                    tabla[lepes->hova_x][lepes->hova_y].babu == 'p') {
+                         if (honnan->x == 4 && tabla[4][hova->y].babu == 'p' &&
+                         tabla[4][hova->y].szin == ellenkezoszin) {
+                              tabla[4][hova->y].szin = '-';
+                              tabla[4][hova->y].babu = '-';
+                              return 4; //en passant
+                         }
+                    }
                }
-               //TODO: csere, en passant
           }
-
           return 0;
      }
 
@@ -710,6 +717,10 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      } else {
           l->leutott_babu = '-';
           l->leutott_szin = '-';
+          if (lepesellenorzo == 4)  {
+               l->leutott_babu = 'p';
+               l->leutott_szin = (hova->szin == 'w') ? 'b' : 'w';
+          }
      }
      l->elozo = lepes;
      
@@ -764,7 +775,7 @@ void aktualis_megjelenit(Mezo* m) {
 }
 
 //ez a metódus segí megtalálni, hogy paraszt cserélés volt-e a játszma során
-int lepes_visszakovetes() {
+int volt_e_paraszt_csere() {
      Lepes* l_jelenlegi = lepes;
      Lepes* l_elozo = lepes->elozo;
      int sor = 0;
@@ -788,11 +799,27 @@ void visszalepes() {
      }
 
      if (lepes->honnan_x == 1 && lepes->hova_x == 0) {
-          if (lepes_visszakovetes() == 6) tabla[lepes->hova_x][lepes->hova_y].babu = 'p';
+          if (volt_e_paraszt_csere() == 6) tabla[lepes->hova_x][lepes->hova_y].babu = 'p';
      }
 
      if (lepes->honnan_x == 6 && lepes->hova_x == 7) {
-          if (lepes_visszakovetes() == 1) tabla[lepes->hova_x][lepes->hova_y].babu = 'p';
+          if (volt_e_paraszt_csere() == 1) tabla[lepes->hova_x][lepes->hova_y].babu = 'p';
+     }
+
+     //ha fehér paraszt csinált en passant-ot
+     if (lepes->leutott_babu == 'p' && lepes->leutott_szin == 'b' && lepes->honnan_x == 3 && lepes->elozo->honnan_x == 1 && lepes->elozo->hova_x == 3) {
+          tabla[lepes->elozo->hova_x][lepes->elozo->hova_y].babu = 'p';
+          tabla[lepes->elozo->hova_x][lepes->elozo->hova_y].szin = 'b';
+          lepes->leutott_babu = '-';
+          lepes->leutott_szin = '-';
+     }
+
+     //ha fekete paraszt csinált en passant-ot
+     if (lepes->leutott_babu == 'p' && lepes->leutott_szin == 'w' && lepes->honnan_x == 4 && lepes->elozo->honnan_x == 6 && lepes->elozo->hova_x == 4) {
+          tabla[lepes->hova_x - 1][lepes->hova_y].babu = 'p';
+          tabla[lepes->hova_x - 1][lepes->hova_y].szin = 'w';
+          lepes->leutott_babu = '-';
+          lepes->leutott_szin = '-';
      }
 
      char ideiglenes_babu = tabla[lepes->honnan_x][lepes->honnan_y].babu;
