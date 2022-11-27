@@ -35,6 +35,7 @@ int egyenesen_balra_ellenoriz(Mezo* jelenlegi, char szin);
 
 int lo_van_e(Mezo* kiraly);
 
+int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin);
 void paraszt_cserelese(Mezo* m);
 int volt_e_paraszt_csere();
 
@@ -614,7 +615,6 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
 
      //bástya lépésének ellenőrzése
      if (honnan->babu == 'r') {
-          //TODO: sáncolás
           if (egyenesen_jo_e(honnan, hova)) return 1;
           else return 0;
      }
@@ -627,6 +627,27 @@ int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin) {
 
      //király lépésének ellenőrzése
      if (honnan->babu == 'k') {
+          if (honnan->y == hova->y - 2) {
+               if (tabla[honnan->x][honnan->y + 1].babu == '-' && tabla[honnan->x][honnan->y + 2].babu == '-' &&
+               tabla[honnan->x][honnan->y + 3].babu == 'r') {
+                    Lepes* seged = lepes;
+                    while (seged != NULL) {
+                         if (seged->honnan_x == honnan->x && (seged->honnan_y == honnan->y + 3 || seged->honnan_y == honnan->y)) return 0;
+                         seged = seged->elozo;
+                    }
+                    return 5; //sáncolás
+               }
+          } else if (honnan->y == hova->y + 2) {
+               if (tabla[honnan->x][honnan->y - 1].babu == '-' && tabla[honnan->x][honnan->y - 2].babu == '-' &&
+               tabla[honnan->x][honnan->y - 3].babu == '-' && tabla[honnan->x][honnan->y - 4].babu == 'r') {
+                    Lepes* seged = lepes;
+                    while (seged != NULL) {
+                         if (seged->honnan_x == honnan->x && (seged->honnan_y == honnan->y - 4 || seged->honnan_y == honnan->y)) return 0;
+                         seged = seged->elozo;
+                    }
+                    return 5; //sáncolás
+               }
+          }
           if (kiraly_lepes(honnan, hova)) {
                if (honnan->szin == 'w') feher_kiraly = honnan;
                else fekete_kiraly = honnan;
@@ -704,6 +725,19 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      }
 
      if (lepesellenorzo == 2) paraszt_cserelese(hova);
+     if (lepesellenorzo == 5) {
+          if (hova->y == honnan->y + 2) { //jobbra sáncolás
+               tabla[hova->x][7].babu = '-';
+               tabla[hova->x][7].szin = '-';
+               tabla[hova->x][hova->y - 1].babu = 'r';
+               tabla[hova->x][hova->y - 1].szin = hova->szin;
+          } else if (hova->y == honnan->y - 2) { //balra sáncolás
+               tabla[hova->x][0].babu = '-';
+               tabla[hova->x][0].szin = '-';
+               tabla[hova->x][hova->y + 1].babu = 'r';
+               tabla[hova->x][hova->y + 1].szin = hova->szin;
+          }
+     }
      
      Lepes *l;
      l = (Lepes*) malloc(sizeof(Lepes));
@@ -796,6 +830,18 @@ void visszalepes() {
      if (tabla[lepes->hova_x][lepes->hova_y].babu == 'k') {
           if (tabla[lepes->hova_x][lepes->hova_y].szin == 'w') feher_kiraly = &tabla[lepes->honnan_x][lepes->honnan_y];
           if (tabla[lepes->hova_x][lepes->hova_y].szin == 'b') fekete_kiraly = &tabla[lepes->honnan_x][lepes->honnan_y];
+
+          if (lepes->honnan_y == lepes->hova_y - 2) { //ha jobbra sáncolás volt
+               tabla[lepes->honnan_x][5].babu = '-';
+               tabla[lepes->honnan_x][5].szin = '-';
+               tabla[lepes->honnan_x][7].babu = 'r';
+               tabla[lepes->honnan_x][7].szin = tabla[lepes->hova_x][lepes->hova_y].szin;
+          } else if (lepes->honnan_y == lepes->hova_y + 2) { //ha balra sáncolás volt
+               tabla[lepes->honnan_x][3].babu = '-';
+               tabla[lepes->honnan_x][3].szin = '-';
+               tabla[lepes->honnan_x][0].babu = 'r';
+               tabla[lepes->honnan_x][0].szin = tabla[lepes->hova_x][lepes->hova_y].szin;
+          }
      }
 
      if (lepes->honnan_x == 1 && lepes->hova_x == 0) {
@@ -864,7 +910,7 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
      int muvelet = 0, x, y, ellenoriz, sakk_e = 0;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
-     aktualis_megjelenit(&tabla[0][0]);
+     if (betolt_e == "-") aktualis_megjelenit(&tabla[0][0]);
 
      if (betolt_vege == 1) {
           if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
@@ -878,7 +924,7 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
 
      while(muvelet != 9) {
           if (sakk_e == 1) {
-               aktualis_megjelenit(&tabla[0][0]);
+               if (betolt_e == "-") aktualis_megjelenit(&tabla[0][0]);
                printf("Sakk!\n");
                sakk_e = 0;
           }
@@ -905,7 +951,7 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
                     } else if (ellenoriz == 1) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
-                         aktualis_megjelenit(&tabla[0][0]);
+                         if (betolt_e == "-") aktualis_megjelenit(&tabla[0][0]);
                     } else if (ellenoriz == 3) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
@@ -1017,11 +1063,12 @@ void jatek_mentese() {
 
      FILE *mentes = fopen(jatek, "w");
      if (mentes == NULL) {
-          printf("Sikertelen mentés.");
+          printf("Sikertelen mentés!");
      }
      
      fajlbair(mentes, lepes);
 
+     printf("\nSikeres mentés!\n");
      fclose(mentes);
 }
 
