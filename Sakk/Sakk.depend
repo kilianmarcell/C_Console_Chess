@@ -1,0 +1,132 @@
+# depslib dependency file v1.0
+1669572457 source:d:\nagyházi\sakk\main.c
+	<stdio.h>
+	<stdlib.h>
+	"mezo.h"
+	"lepes.h"
+	"konvertalasok.h"
+	"babu_lepesek.h"
+	"sakk_ellenorzo.h"
+	"lepes_ellenorzo.h"
+	"menu.h"
+	"debugmalloc.h"
+
+1669198337 d:\nagyházi\sakk\mezo.h
+
+1669534659 d:\nagyházi\sakk\lepes.h
+
+1668700734 d:\nagyházi\sakk\debugmalloc.h
+	<stdbool.h>
+	<stddef.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<string.h>
+	<stdarg.h>
+	<process.h>
+	<unistd.h>
+
+1669567466 source:d:\nagyházi\sakk\konvertalasok.c
+	<stdio.h>
+	<ctype.h>
+
+1669568572 source:d:\nagyházi\sakk\babu_lepesek.c
+	"mezo.h"
+	"konvertalasok.h"
+
+1669567032 d:\nagyházi\sakk\konvertalasok.h
+
+1669568567 source:d:\nagyházi\sakk\sakk_ellenorzo.c
+	"mezo.h"
+	"babu_lepesek.h"
+
+1669567996 d:\nagyházi\sakk\babu_lepesek.h
+
+1669568182 d:\nagyházi\sakk\sakk_ellenorzo.h
+
+1669568471 d:\nagyházi\sakk\lepes_ellenorzo.h
+
+1669571170 source:d:\nagyházi\sakk\lepes_ellenorzo.c
+	<stdio.h>
+	<stdlib.h>
+	"mezo.h"
+	"lepes.h"
+	"babu_lepesek.h"
+	"konvertalasok.h"
+	"sakk_ellenorzo.h"
+
+1669570362 source:d:\nagyházi\sakk\hibauzenet.c
+	<stdio.h>
+
+1669570380 source:d:\nagyházi\sakk\hasznalati utmutato.c
+	<stdio.h>
+	<stdlib.h>
+	"hibauzenet.h"
+	"menu.h"
+
+1669570234 d:\nagyházi\sakk\hibauzenet.h
+
+1669570122 d:\nagyházi\sakk\menu.h
+
+1669572444 source:d:\nagyházi\sakk\jatszma.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"mezo.h"
+	"lepes.h"
+	"jatszma.h"
+	"konvertalasok.h"
+	"lepes_ellenorzo.h"
+	"jatszma_lepesek.h"
+	"sakk_ellenorzo.h"
+	"menu.h"
+	"hibauzenet.h"
+	"mentes_beolvas.h"
+
+1669572251 d:\nagyházi\sakk\jatszma.h
+	"mezo.h"
+	"lepes.h"
+
+1669570814 d:\nagyházi\sakk\jatszma_lepesek.h
+
+1669569912 d:\nagyházi\sakk\mentes_beolvas.h
+
+1669571253 source:d:\nagyházi\sakk\jatszma_lepesek.c
+	<stdio.h>
+	<stdlib.h>
+	"mezo.h"
+	"lepes.h"
+	"konvertalasok.h"
+	"jatszma.h"
+
+1669571469 source:d:\nagyházi\sakk\mentes_beolvas.c
+	<stdio.h>
+	<stdlib.h>
+	"lepes.h"
+	"jatszma.h"
+	"konvertalasok.h"
+	"menu.h"
+	"mentes_beolvas.h"
+
+1669572389 source:d:\nagyházi\sakk\hasznalati_utmutato.c
+	<stdio.h>
+	<stdlib.h>
+	"hibauzenet.h"
+	"menu.h"
+
+1669572550 source:d:\nagyházi\sakk\kilepes.c
+	<stdlib.h>
+
+1669572565 source:d:\nagyházi\sakk\menu.c
+	<stdio.h>
+	<stdlib.h>
+	"jatszma.h"
+	"mentes_beolvas.h"
+	"hasznalati_utmutato.h"
+	"kilepes.h"
+	"hibauzenet.h"
+
+1669572361 d:\nagyházi\sakk\hasznalati_utmutato.h
+
+1669572526 d:\nagyházi\sakk\kilepes.h
+

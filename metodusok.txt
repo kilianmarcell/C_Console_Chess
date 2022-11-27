@@ -1,0 +1,66 @@
+//konvertalasok
+int helyesxy(int* x, int* y);
+int helyes_sor_oszlop(char* honnanoszlop, char* hovaoszlop);
+int betubol_szamra_konvertal(char* betu);
+char *baburakonvertal(char betu, char szin);
+int tablan_belul_van_e(int x, int y);
+int karakterbol_szamra_konvertal(char c);
+
+//babu lepesek
+int lo_lepes(Mezo* jelenlegi, Mezo* hova);
+int kiraly_lepes(Mezo* jelenlegi, Mezo* hova);
+int jobbra_fel_lepes(Mezo* jelenlegi, Mezo* hova);
+int jobbra_le_lepes(Mezo* jelenlegi, Mezo* hova);
+int balra_fel_lepes(Mezo* jelenlegi, Mezo* hova);
+int balra_le_lepes(Mezo* jelenlegi, Mezo* hova);
+int atlosan_jo_e(Mezo* honnan, Mezo* hova);
+int egyenes_fel_lepes(Mezo *jelenlegi, Mezo *hova);
+int egyenes_le_lepes(Mezo *jelenlegi, Mezo *hova);
+int egyenes_jobbra_lepes(Mezo *jelenlegi, Mezo *hova);
+int egyenes_balra_lepes(Mezo *jelenlegi, Mezo *hova);
+int egyenesen_jo_e(Mezo* honnan, Mezo* hova);
+int jobbra_fel_ellenoriz(Mezo* jelenlegi, char szin);
+int jobbra_le_ellenoriz(Mezo* jelenlegi, char szin);
+int balra_fel_ellenoriz(Mezo* jelenlegi, char szin);
+int balra_le_ellenoriz(Mezo* jelenlegi, char szin);
+int egyenesen_fel_ellenoriz(Mezo* jelenlegi, char szin);
+int egyenesen_le_ellenoriz(Mezo* jelenlegi, char szin);
+int egyenesen_jobbra_ellenoriz(Mezo* jelenlegi, char szin);
+int egyenesen_balra_ellenoriz(Mezo* jelenlegi, char szin);
+int lo_van_e(Mezo* kiraly);
+int paraszt_van_e(Mezo* kiraly);
+
+//sakk ellenorzo
+int sakk_ellenoriz(Mezo* feher, Mezo* fekete);
+int oda_tud_e_lepni_seged(Mezo* m, char szin);
+
+//lepes ellenorzo
+int lepes_ellenorzes(Mezo* honnan, Mezo* hova, char szin);
+void paraszt_cserelese(Mezo* m);
+int kiraly_tud_e_lepni(Mezo* m);
+int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin);
+
+//jatszma lepesek
+void elozo_lepesek_kiir(Lepes* l, int szamol);
+int volt_e_paraszt_csere();
+void visszalepes();
+
+//jatszma
+void uj_jatek(int* navigal);
+void aktualis_megjelenit(Mezo* m);
+int lepesek_megszamolasa(Lepes* l, int ossz);
+int egy_lepes(char* betolt_e, int betolt_vege);
+void tabla_betolt();
+
+//mentes beolvasas
+void jatek_mentese();
+void fajlbair(FILE* mentes, Lepes* lepes);
+void jatek_betolt(int* navigal);
+
+//hasznalati utmutato
+void hasznalati_utmutato(int* navigal);
+
+//main
+void kilepes();
+void hibauzenet(char *uzenet);
+void menu(int* navigal);
