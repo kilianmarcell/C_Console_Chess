@@ -130,3 +130,129 @@
 
 1669572526 d:\nagyházi\sakk\kilepes.h
 
+1669572457 source:d:\progi\c\sakk\sakk\main.c
+	<stdio.h>
+	<stdlib.h>
+	"mezo.h"
+	"lepes.h"
+	"konvertalasok.h"
+	"babu_lepesek.h"
+	"sakk_ellenorzo.h"
+	"lepes_ellenorzo.h"
+	"menu.h"
+	"debugmalloc.h"
+
+1669198337 d:\progi\c\sakk\sakk\mezo.h
+
+1669534659 d:\progi\c\sakk\sakk\lepes.h
+
+1669567032 d:\progi\c\sakk\sakk\konvertalasok.h
+
+1669567996 d:\progi\c\sakk\sakk\babu_lepesek.h
+
+1669568182 d:\progi\c\sakk\sakk\sakk_ellenorzo.h
+
+1669568471 d:\progi\c\sakk\sakk\lepes_ellenorzo.h
+
+1669570122 d:\progi\c\sakk\sakk\menu.h
+
+1668700734 d:\progi\c\sakk\sakk\debugmalloc.h
+	<stdbool.h>
+	<stddef.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<string.h>
+	<stdarg.h>
+	<process.h>
+	<unistd.h>
+
+1669584810 source:d:\progi\c\sakk\sakk\mentes_beolvas.c
+	<stdio.h>
+	<stdlib.h>
+	"lepes.h"
+	"jatszma.h"
+	"konvertalasok.h"
+	"menu.h"
+	"mentes_beolvas.h"
+
+1669572251 d:\progi\c\sakk\sakk\jatszma.h
+	"mezo.h"
+	"lepes.h"
+
+1669584753 d:\progi\c\sakk\sakk\mentes_beolvas.h
+	"lepes.h"
+
+1669568572 source:d:\progi\c\sakk\sakk\babu_lepesek.c
+	"mezo.h"
+	"konvertalasok.h"
+
+1669572389 source:d:\progi\c\sakk\sakk\hasznalati_utmutato.c
+	<stdio.h>
+	<stdlib.h>
+	"hibauzenet.h"
+	"menu.h"
+
+1669570234 d:\progi\c\sakk\sakk\hibauzenet.h
+
+1669570362 source:d:\progi\c\sakk\sakk\hibauzenet.c
+	<stdio.h>
+
+1669572444 source:d:\progi\c\sakk\sakk\jatszma.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"mezo.h"
+	"lepes.h"
+	"jatszma.h"
+	"konvertalasok.h"
+	"lepes_ellenorzo.h"
+	"jatszma_lepesek.h"
+	"sakk_ellenorzo.h"
+	"menu.h"
+	"hibauzenet.h"
+	"mentes_beolvas.h"
+
+1669570814 d:\progi\c\sakk\sakk\jatszma_lepesek.h
+
+1669571253 source:d:\progi\c\sakk\sakk\jatszma_lepesek.c
+	<stdio.h>
+	<stdlib.h>
+	"mezo.h"
+	"lepes.h"
+	"konvertalasok.h"
+	"jatszma.h"
+
+1669572550 source:d:\progi\c\sakk\sakk\kilepes.c
+	<stdlib.h>
+
+1669567466 source:d:\progi\c\sakk\sakk\konvertalasok.c
+	<stdio.h>
+	<ctype.h>
+
+1669571170 source:d:\progi\c\sakk\sakk\lepes_ellenorzo.c
+	<stdio.h>
+	<stdlib.h>
+	"mezo.h"
+	"lepes.h"
+	"babu_lepesek.h"
+	"konvertalasok.h"
+	"sakk_ellenorzo.h"
+
+1669572565 source:d:\progi\c\sakk\sakk\menu.c
+	<stdio.h>
+	<stdlib.h>
+	"jatszma.h"
+	"mentes_beolvas.h"
+	"hasznalati_utmutato.h"
+	"kilepes.h"
+	"hibauzenet.h"
+
+1669572361 d:\progi\c\sakk\sakk\hasznalati_utmutato.h
+
+1669572526 d:\progi\c\sakk\sakk\kilepes.h
+
+1669568567 source:d:\progi\c\sakk\sakk\sakk_ellenorzo.c
+	"mezo.h"
+	"babu_lepesek.h"
+

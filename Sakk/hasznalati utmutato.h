@@ -1,6 +1,0 @@
-#ifndef HASZNALATI_UTMUTATO_H_INCLUDED
-#define HASZNALATI_UTMUTATO_H_INCLUDED
-
-void hasznalati_utmutato(int* navigal);
-
-#endif // HASZNALATI_UTMUTATO_H_INCLUDED

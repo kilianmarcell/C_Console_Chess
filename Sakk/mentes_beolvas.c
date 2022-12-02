@@ -6,9 +6,6 @@
 #include "menu.h"
 #include "mentes_beolvas.h"
 
-extern char oszlopok[];
-extern Lepes *lepes;
-
 //menti az aktuális játékot
 void jatek_mentese() {
      printf("Hova szeretné menteni a játszmát? ");
@@ -28,6 +25,7 @@ void jatek_mentese() {
 
 //helyes sorrendben menti el a lépéseket
 void fajlbair(FILE* mentes, Lepes* lepes) {
+    printf("\nLepes honnanx honnany: %d %d\n", lepes->honnan_x, lepes->honnan_y);
      if (lepes->elozo != NULL) fajlbair(mentes, lepes->elozo);
 
      fputc(lepes->honnan_x + '0', mentes);
