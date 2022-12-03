@@ -5,8 +5,8 @@
 #include "lepes.h"
 #include "debugmalloc.h"
 
-void menu(int* navigal);
-void jatek_betolt(int* navigal);
+void menu();
+void jatek_betolt();
 void hibauzenet(char *uzenet);
 int karakterbol_szamra_konvertal(char c);
 
@@ -44,14 +44,13 @@ int volt_e_paraszt_csere();
 
 void elozo_lepesek_kiir(Lepes* l, int szamol);
 int lepesek_megszamolasa(Lepes* l, int ossz);
-void tabla_betolt();
-int egy_lepes(char *betolt_e, int betolt_vege);
+Mezo* tabla_betolt();
+int egy_lepes(Mezo* tabla, char *betolt_e, int betolt_vege);
 void jatek_mentese();
 void fajlbair(FILE* mentes, Lepes* lepes);
 
 //-------------------------------------------------------------------------------------------------------
 //Konstansok
-Mezo tabla[8][8];
 Mezo* feher_kiraly;
 Mezo* fekete_kiraly;
 
@@ -954,10 +953,10 @@ void visszalepes() {
 }
 
 //betölt egy sakktáblát, innen kezdődik a játék
-void uj_jatek(int* navigal) {
-     tabla_betolt();
-     if (egy_lepes("-", 0) == 1) {
-          menu(navigal);
+void uj_jatek() {
+     Mezo* tabla = tabla_betolt();
+     if (egy_lepes(tabla, "-", 0) == 1) {
+          menu();
      }
 }
 
@@ -971,11 +970,11 @@ int lepesek_megszamolasa(Lepes* l, int ossz) {
 }
 
 //egy lépést valósít meg
-int egy_lepes(char* betolt_e, int betolt_vege) {
+int egy_lepes(Mezo* tabla, char* betolt_e, int betolt_vege) {
      int muvelet = 0, x, y, ellenoriz, sakk_e = 0;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
-     if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
+     if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla);
 
      if (betolt_vege == 1) {
           if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
@@ -989,7 +988,7 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
 
      while(muvelet != 9) {
           if (sakk_e == 1) {
-               if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
+               if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla);
                printf("Sakk!\n");
                sakk_e = 0;
           }
@@ -1001,8 +1000,8 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
           }
           if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
                if (helyesxy(&x, &y) && helyes_sor_oszlop(&sor, &oszlop)) {
-                    ellenoriz = pozicio_cserel(&tabla[7 - (x - 1)][betubol_szamra_konvertal(&sor)],
-                         &tabla[7 - (y - 1)][betubol_szamra_konvertal(&oszlop)], jatekos);
+                    ellenoriz = pozicio_cserel((tabla + 8 * (7 - (x - 1)) + betubol_szamra_konvertal(&sor)),
+                         (tabla + 8 * (7 - (y - 1) + betubol_szamra_konvertal(&oszlop))), jatekos);
                     if (ellenoriz == 0) {
                          if (strcmp(betolt_e, "-") == 1) return 1;
                          if (jatekos == 'w') {
@@ -1016,7 +1015,7 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
                     } else if (ellenoriz == 1) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
-                         if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
+                         if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla);
                     } else if (ellenoriz == 3) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
@@ -1046,7 +1045,7 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
                               sakk_e = 0;
                          }
                     } else {
-                         aktualis_megjelenit(&tabla[0][0]);
+                         aktualis_megjelenit(tabla);
                          printf("Nem lehet visszalépni!\n\n");
                     }
                } else if (muvelet == 1) {
@@ -1057,11 +1056,16 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
                hibauzenet("bemeneti erteket");
           }
      }
-     
-     printf("Elmenti a jatekot?: ");
-     char valasz;
-     scanf("%c", &valasz);
-     if (valasz == 'i') jatek_mentese();
+
+     if (muvelet == 9) {
+          printf("Elmenti a jatekot?: ");
+          char valasz;
+          getchar();
+          scanf("%c", &valasz);
+          if (valasz == 'i') {
+               jatek_mentese();
+          }
+     }
      
      while (lepes != NULL) {
           Lepes *seged = lepes->elozo;
@@ -1069,11 +1073,13 @@ int egy_lepes(char* betolt_e, int betolt_vege) {
           lepes = seged;
      }
 
+     if (betolt_vege == 1) menu();
      return 1;
 }
 
 //betölt egy üres táblát
-void tabla_betolt() {
+Mezo* tabla_betolt() {
+     Mezo tabla[8][8];
      //tábla feltöltése
      for(int i = 0; i < 8; i++) {
           for(int j = 0; j < 8; j++) {
@@ -1122,6 +1128,8 @@ void tabla_betolt() {
 
      feher_kiraly = &tabla[7][4];
      fekete_kiraly = &tabla[0][4];
+
+     return &tabla[0][0];
 }
 
 //menti az aktuális játékot
@@ -1153,7 +1161,7 @@ void fajlbair(FILE* mentes, Lepes* lepes) {
 }
 
 //betölt egy elmentett sakkjátszmát
-void jatek_betolt(int* navigal) {
+void jatek_betolt() {
      FILE *jatszma;
      char jatek[50];
 
@@ -1163,10 +1171,10 @@ void jatek_betolt(int* navigal) {
      jatszma = fopen(jatek, "r");
      if (jatszma == NULL) {
           printf("Nincs ilyen fájl");
-          menu(navigal);
+          menu();
      }
 
-     tabla_betolt();
+     Mezo* tabla = tabla_betolt();
 
      fseek(jatszma, 0, SEEK_END);
      int length = ftell(jatszma);
@@ -1192,7 +1200,7 @@ void jatek_betolt(int* navigal) {
           bemenet[3] = (8 - karakterbol_szamra_konvertal(beolvasott[i - 2])) + '0';
           bemenet[4] = '\0';
 
-          if (egy_lepes(bemenet, 0) == 0) {
+          if (egy_lepes(tabla, bemenet, 0) == 0) {
                while (lepes != NULL) {
                     Lepes *seged = lepes->elozo;
                     free(lepes);
@@ -1202,17 +1210,18 @@ void jatek_betolt(int* navigal) {
                fclose(jatszma);
                system("cls");
                printf("Hibás lépés van ebben a játszmában!\n");
-               menu(navigal);
+               menu();
+               return;
           }
      }
      free(beolvasott);
      fclose(jatszma);
      
-     egy_lepes("-", 1);
+     egy_lepes(tabla, "-", 1);
 }
 
 //megjeleníti a használati útmutatót, megjeleníti a programmal kapcsolatos tudnivalókat
-void hasznalati_utmutato(int* navigal) {
+void hasznalati_utmutato() {
      printf("- Sakk -\n\n- Leptetes\n");
      printf("Ket bemeneti erteket kell beirni (ketto darab koordinatat) a babuk leptetesehez egy jatszmaban. ");
      printf("Az elso az a pozicio amelyik helyrol szeretnenk leptetni a babunkat, ");
@@ -1228,15 +1237,16 @@ void hasznalati_utmutato(int* navigal) {
      printf("(a kiterjesztes txt) peldaul: jatszma.txt");
 
      printf("\n\n9. Vissza a menube\n\nValasztas: ");
-     scanf("%d", navigal);
-     if (*navigal != 9) {
+     int beolvas;
+     scanf("%d", &beolvas);
+     if (beolvas != 9) {
           hibauzenet("erteket");
           printf("9. Vissza a menube\n\nValasztas: ");
-          scanf("%d", navigal);
+          scanf("%d", &beolvas);
           system("cls");
      }
      system("cls");
-     menu(navigal);
+     menu();
 }
 
 //ez a metódus kilép a programból
@@ -1251,23 +1261,23 @@ void hibauzenet(char *uzenet) {
 
 //amikor betölt a program ez a metódus fut le először, ez a metódus a menüt jelenti, itt dönti el a felhasználó,
 //hogy mit szeretne a programon belül csinálni, ez a metódus a felhasználó által választott metódust hívja meg
-void menu(int* navigal) {
+void menu() {
+     int beolvas;
      printf("- Sakk -\n\n1. Uj jatek\n2. Jatek betoltese\n3. Hasznalati utmutato\n\n9. Kilepes\n\n");
      printf("Valasztas: ");
-     scanf("%d", navigal);
-     printf("\n\n%d\n\n", *navigal);
-     switch (*navigal) {
+     scanf("%d", &beolvas);
+     switch (beolvas) {
           case 1:
                system("cls");
-               uj_jatek(navigal);
+               uj_jatek();
                break;
           case 2:
                system("cls");
-               jatek_betolt(navigal);
+               jatek_betolt();
                break;
           case 3:
                system("cls");
-               hasznalati_utmutato(navigal);
+               hasznalati_utmutato();
                break;
           case 9:
                kilepes();
@@ -1275,12 +1285,12 @@ void menu(int* navigal) {
           default:
                system("cls");
                hibauzenet("erteket");
-               menu(navigal);
+               menu();
+               break;
      }
 }
 
 int main(void) {
      SetConsoleOutputCP(650001);
-     int navigal;
-     menu(&navigal);
+     menu();
 }
