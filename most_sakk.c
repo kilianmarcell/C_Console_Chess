@@ -1,3 +1,4 @@
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "mezo.h"
@@ -786,15 +787,20 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
      if (lepesellenorzo == 2) paraszt_cserelese(hova);
      if (lepesellenorzo == 5) {
           if (hova->y == honnan->y + 2) { //jobbra sáncolás
-               tabla[hova->x][7].babu = '-';
-               tabla[hova->x][7].szin = '-';
-               tabla[hova->x][hova->y - 1].babu = 'r';
-               tabla[hova->x][hova->y - 1].szin = hova->szin;
+               if (oda_tud_e_lepni_seged(&tabla[hova->x][5], hova->szin) == 0 && oda_tud_e_lepni_seged(&tabla[hova->x][6], hova->szin) == 0) {
+                    tabla[hova->x][7].babu = '-';
+                    tabla[hova->x][7].szin = '-';
+                    tabla[hova->x][hova->y - 1].babu = 'r';
+                    tabla[hova->x][hova->y - 1].szin = hova->szin;
+               }
           } else if (hova->y == honnan->y - 2) { //balra sáncolás
-               tabla[hova->x][0].babu = '-';
-               tabla[hova->x][0].szin = '-';
-               tabla[hova->x][hova->y + 1].babu = 'r';
-               tabla[hova->x][hova->y + 1].szin = hova->szin;
+               if (oda_tud_e_lepni_seged(&tabla[hova->x][1], hova->szin) == 0 && oda_tud_e_lepni_seged(&tabla[hova->x][2], hova->szin) == 0 &&
+                    oda_tud_e_lepni_seged(&tabla[hova->x][3], hova->szin) == 0) {
+                    tabla[hova->x][0].babu = '-';
+                    tabla[hova->x][0].szin = '-';
+                    tabla[hova->x][hova->y + 1].babu = 'r';
+                    tabla[hova->x][hova->y + 1].szin = hova->szin;
+               }
           }
      }
      
@@ -1274,6 +1280,7 @@ void menu(int* navigal) {
 }
 
 int main(void) {
+     SetConsoleOutputCP(650001);
      int navigal;
      menu(&navigal);
 }
