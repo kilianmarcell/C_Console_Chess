@@ -44,8 +44,8 @@ int volt_e_paraszt_csere();
 
 void elozo_lepesek_kiir(Lepes* l, int szamol);
 int lepesek_megszamolasa(Lepes* l, int ossz);
-Mezo* tabla_betolt();
-int egy_lepes(Mezo* tabla, char *betolt_e, int betolt_vege);
+Mezo** tabla_betolt();
+int egy_lepes(Mezo** tabla, char *betolt_e, int betolt_vege);
 void jatek_mentese();
 void fajlbair(FILE* mentes, Lepes* lepes);
 
@@ -55,15 +55,6 @@ Mezo* feher_kiraly;
 Mezo* fekete_kiraly;
 
 Lepes *lepes = NULL;
-
-//a sakktábla oszlopait tárolja a karaktertömb
-char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
-
-//a sakkbábuk betűit tárolja a karaktertömb
-char babubetuk[] = { 'k', 'q', 'r', 'b', 'h', 'p' };
-
-//a sakkbábukat tárolja el a "karaktertömb"
-char *babuk[] = { "♔", "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜", "♝", "♞", "♟︎" };
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -75,6 +66,8 @@ int helyesxy(int* x, int* y) {
 
 //ellenőrzi, hogy érvényes pozíciót adott-e meg a felhasználó (sakk játszma közben)
 int helyes_sor_oszlop(char* honnanoszlop, char* hovaoszlop) {
+     //a sakktábla oszlopait tárolja a karaktertömb
+     char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
      *honnanoszlop = tolower(*honnanoszlop);
      *hovaoszlop = tolower(*hovaoszlop);
      int szamol = 0;
@@ -88,6 +81,8 @@ int helyes_sor_oszlop(char* honnanoszlop, char* hovaoszlop) {
 
 //a játékos által megadott betűt egy y koordinátává változtatja
 int betubol_szamra_konvertal(char* betu) {
+     //a sakktábla oszlopait tárolja a karaktertömb
+     char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
      for(int i = 0; i < 8; i++) {
           if (oszlopok[i] == *betu) return (i);
      }
@@ -97,6 +92,10 @@ int betubol_szamra_konvertal(char* betu) {
 
 //egy bábunak a betűjéből és a színéből előállítja a bábut
 char *baburakonvertal(char betu, char szin) {
+     //a sakkbábukat tárolja el a "karaktertömb"
+     char *babuk[] = { "♔", "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜", "♝", "♞", "♟︎" };
+     //a sakkbábuk betűit tárolja a karaktertömb
+     char babubetuk[] = { 'k', 'q', 'r', 'b', 'h', 'p' };
      int hanyadik;
      
      for(int i = 0; i < 8; i++) {
@@ -831,6 +830,8 @@ int pozicio_cserel(Mezo* honnan, Mezo* hova, char szin) {
 }
 
 void elozo_lepesek_kiir(Lepes* l, int szamol) {
+     //a sakktábla oszlopait tárolja a karaktertömb
+     char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
      if (szamol < 5 && l != NULL) {
           elozo_lepesek_kiir(l->elozo, szamol + 1);
           printf("%c%d->%c%d   ", oszlopok[l->honnan_y], 8 - l->honnan_x, oszlopok[l->hova_y], 8 - l->hova_x);
@@ -839,6 +840,8 @@ void elozo_lepesek_kiir(Lepes* l, int szamol) {
 
 //megjeleníti az aktuális táblát és a navigációkat
 void aktualis_megjelenit(Mezo* m) {
+     //a sakktábla oszlopait tárolja a karaktertömb
+     char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
      // system("cls");
      if (lepesek_megszamolasa(lepes, 0) > 0) {
           printf("Utolsó 5 lépés:   ");
@@ -954,7 +957,7 @@ void visszalepes() {
 
 //betölt egy sakktáblát, innen kezdődik a játék
 void uj_jatek() {
-     Mezo* tabla = tabla_betolt();
+     Mezo** tabla = tabla_betolt();
      if (egy_lepes(tabla, "-", 0) == 1) {
           menu();
      }
@@ -970,11 +973,11 @@ int lepesek_megszamolasa(Lepes* l, int ossz) {
 }
 
 //egy lépést valósít meg
-int egy_lepes(Mezo* tabla, char* betolt_e, int betolt_vege) {
+int egy_lepes(Mezo** tabla, char* betolt_e, int betolt_vege) {
      int muvelet = 0, x, y, ellenoriz, sakk_e = 0;
      char sor, oszlop, jatekos = 'w';
      char bemenet[5];
-     if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla);
+     if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
 
      if (betolt_vege == 1) {
           if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
@@ -988,7 +991,7 @@ int egy_lepes(Mezo* tabla, char* betolt_e, int betolt_vege) {
 
      while(muvelet != 9) {
           if (sakk_e == 1) {
-               if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla);
+               if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
                printf("Sakk!\n");
                sakk_e = 0;
           }
@@ -1000,8 +1003,8 @@ int egy_lepes(Mezo* tabla, char* betolt_e, int betolt_vege) {
           }
           if (sscanf(bemenet, "%c%d %c%d", &sor, &x, &oszlop, &y) == 4) {
                if (helyesxy(&x, &y) && helyes_sor_oszlop(&sor, &oszlop)) {
-                    ellenoriz = pozicio_cserel((tabla + 8 * (7 - (x - 1)) + betubol_szamra_konvertal(&sor)),
-                         (tabla + 8 * (7 - (y - 1) + betubol_szamra_konvertal(&oszlop))), jatekos);
+                    ellenoriz = pozicio_cserel(&tabla[7 - (x - 1)][betubol_szamra_konvertal(&sor)],
+                         &tabla[7 - (y - 1)][betubol_szamra_konvertal(&oszlop)], jatekos);
                     if (ellenoriz == 0) {
                          if (strcmp(betolt_e, "-") == 1) return 1;
                          if (jatekos == 'w') {
@@ -1015,7 +1018,7 @@ int egy_lepes(Mezo* tabla, char* betolt_e, int betolt_vege) {
                     } else if (ellenoriz == 1) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
-                         if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla);
+                         if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(&tabla[0][0]);
                     } else if (ellenoriz == 3) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
@@ -1045,7 +1048,7 @@ int egy_lepes(Mezo* tabla, char* betolt_e, int betolt_vege) {
                               sakk_e = 0;
                          }
                     } else {
-                         aktualis_megjelenit(tabla);
+                         aktualis_megjelenit(&tabla[0][0]);
                          printf("Nem lehet visszalépni!\n\n");
                     }
                } else if (muvelet == 1) {
@@ -1078,8 +1081,12 @@ int egy_lepes(Mezo* tabla, char* betolt_e, int betolt_vege) {
 }
 
 //betölt egy üres táblát
-Mezo* tabla_betolt() {
-     Mezo tabla[8][8];
+Mezo** tabla_betolt() {
+     Mezo **tabla;
+
+     tabla = malloc(sizeof(Mezo*) * 8);
+     for (int i = 0; i < 8; i++) tabla[i] = malloc(sizeof(Mezo*) * 8);
+
      //tábla feltöltése
      for(int i = 0; i < 8; i++) {
           for(int j = 0; j < 8; j++) {
@@ -1129,7 +1136,7 @@ Mezo* tabla_betolt() {
      feher_kiraly = &tabla[7][4];
      fekete_kiraly = &tabla[0][4];
 
-     return &tabla[0][0];
+     return tabla;
 }
 
 //menti az aktuális játékot
@@ -1162,6 +1169,8 @@ void fajlbair(FILE* mentes, Lepes* lepes) {
 
 //betölt egy elmentett sakkjátszmát
 void jatek_betolt() {
+     //a sakktábla oszlopait tárolja a karaktertömb
+     char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
      FILE *jatszma;
      char jatek[50];
 
@@ -1174,7 +1183,7 @@ void jatek_betolt() {
           menu();
      }
 
-     Mezo* tabla = tabla_betolt();
+     Mezo** tabla = tabla_betolt();
 
      fseek(jatszma, 0, SEEK_END);
      int length = ftell(jatszma);
