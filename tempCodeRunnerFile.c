@@ -1,1 +1,1 @@
-egy_lepes
+void visszalepes(Mezo** tabla)
