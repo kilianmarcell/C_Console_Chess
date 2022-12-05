@@ -84,7 +84,7 @@ int betubol_szamra_konvertal(char* betu) {
      //a sakktábla oszlopait tárolja a karaktertömb
      char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
      for(int i = 0; i < 8; i++) {
-          if (oszlopok[i] == *betu) return (7 - i);
+          if (oszlopok[i] == *betu) return i;
      }
 
      return 0;
@@ -322,7 +322,6 @@ int jobbra_fel_ellenoriz(Mezo** tabla, Mezo* jelenlegi, char szin) {
                return jobbra_fel_ellenoriz(tabla, &tabla[jelenlegi->x - 1][jelenlegi->y + 1], szin);
           }
      }
-
      return 0;
 }
 
@@ -506,31 +505,64 @@ int paraszt_van_e(Mezo** tabla, Mezo* kiraly) {
 int sakk_ellenoriz(Mezo** tabla) {
      Mezo* feher = feher_kiraly_mezo(tabla);
      Mezo* fekete = fekete_kiraly_mezo(tabla);
+     
      //átlós lépések
-     if (jobbra_fel_ellenoriz(tabla, &tabla[feher->x - 1][feher->y + 1], 'w')) return 1;
-     if (jobbra_fel_ellenoriz(tabla, &tabla[fekete->x - 1][fekete->y + 1], 'b')) return 2;
+     if (feher->x - 1 >= 0 && feher->y + 1 <= 7) {
+          if (jobbra_fel_ellenoriz(tabla, &tabla[feher->x - 1][feher->y + 1], 'w')) return 1;
+     }
+     if (fekete->x - 1 >= 0 && fekete->y + 1 <= 7) {
+          if (jobbra_fel_ellenoriz(tabla, &tabla[fekete->x - 1][fekete->y + 1], 'b')) return 2;
+     }
 
-     if (jobbra_le_ellenoriz(tabla, &tabla[feher->x + 1][feher->y + 1], 'w')) return 1;
-     if (jobbra_le_ellenoriz(tabla, &tabla[fekete->x + 1][fekete->y + 1], 'b')) return 2;
+     if (feher->x + 1 <= 7 && feher->y + 1 <= 7) {
+          if (jobbra_le_ellenoriz(tabla, &tabla[feher->x + 1][feher->y + 1], 'w')) return 1;
+     }
+     if (fekete->x + 1 <= 7 && fekete->y + 1 <= 7) {
+          if (jobbra_le_ellenoriz(tabla, &tabla[fekete->x + 1][fekete->y + 1], 'b')) return 2;
+     }
 
-     if (balra_fel_ellenoriz(tabla, &tabla[feher->x - 1][feher->y - 1], 'w')) return 1;
-     if (balra_fel_ellenoriz(tabla, &tabla[fekete->x - 1][fekete->y - 1], 'b')) return 2;
+     if (feher->x - 1 >= 0 && feher->y - 1 >= 0) {
+          if (balra_fel_ellenoriz(tabla, &tabla[feher->x - 1][feher->y - 1], 'w')) return 1;
+     }
+     if (fekete->x - 1 >= 0 && fekete->y - 1 >= 0) {
+          if (balra_fel_ellenoriz(tabla, &tabla[fekete->x - 1][fekete->y - 1], 'b')) return 2;
+     }
 
-     if (balra_le_ellenoriz(tabla, &tabla[feher->x + 1][feher->y - 1], 'w')) return 1;
-     if (balra_le_ellenoriz(tabla, &tabla[fekete->x + 1][fekete->y - 1], 'b')) return 2;
+     if (feher->x + 1 <= 7 && feher->y - 1 >= 0) {
+           if (balra_le_ellenoriz(tabla, &tabla[feher->x + 1][feher->y - 1], 'w')) return 1;
+     }
+     if (fekete->x + 1 <= 7 && fekete->y - 1 >= 0) {
+          if (balra_le_ellenoriz(tabla, &tabla[fekete->x + 1][fekete->y - 1], 'b')) return 2;
+     }
 
      //egyenes lépések
-     if (egyenesen_fel_ellenoriz(tabla, &tabla[feher->x - 1][feher->y], 'w')) return 1;
-     if (egyenesen_fel_ellenoriz(tabla, &tabla[fekete->x - 1][fekete->y], 'b')) return 2;
+     if (feher->x - 1 >= 0) {
+          if (egyenesen_fel_ellenoriz(tabla, &tabla[feher->x - 1][feher->y], 'w')) return 1;
+     }
+     if (fekete->x - 1 >= 0) {
+          if (egyenesen_fel_ellenoriz(tabla, &tabla[fekete->x - 1][fekete->y], 'b')) return 2;
+     }
 
-     if (egyenesen_le_ellenoriz(tabla, &tabla[feher->x + 1][feher->y], 'w')) return 1;
-     if (egyenesen_le_ellenoriz(tabla, &tabla[fekete->x + 1][fekete->y], 'b')) return 2;
+     if (feher->x + 1 <= 7) {
+          if (egyenesen_le_ellenoriz(tabla, &tabla[feher->x + 1][feher->y], 'w')) return 1;
+     }
+     if (fekete->x + 1 <= 7) {
+          if (egyenesen_le_ellenoriz(tabla, &tabla[fekete->x + 1][fekete->y], 'b')) return 2;
+     }
 
-     if (egyenesen_jobbra_ellenoriz(tabla, &tabla[feher->x][feher->y + 1], 'w')) return 1;
-     if (egyenesen_jobbra_ellenoriz(tabla, &tabla[fekete->x][fekete->y + 1], 'b')) return 2;
+     if (feher->y + 1 <= 7) {
+          if (egyenesen_jobbra_ellenoriz(tabla, &tabla[feher->x][feher->y + 1], 'w')) return 1;
+     }
+     if (fekete->y + 1 <= 7) {
+          if (egyenesen_jobbra_ellenoriz(tabla, &tabla[fekete->x][fekete->y + 1], 'b')) return 2;
+     }
 
-     if (egyenesen_balra_ellenoriz(tabla, &tabla[feher->x][feher->y - 1], 'w')) return 1;
-     if (egyenesen_balra_ellenoriz(tabla, &tabla[fekete->x][fekete->y - 1], 'b')) return 2;
+     if (feher->y - 1 >= 0) {
+          if (egyenesen_balra_ellenoriz(tabla, &tabla[feher->x][feher->y - 1], 'w')) return 1;
+     }
+     if (fekete->y - 1 >= 0) {
+          if (egyenesen_balra_ellenoriz(tabla, &tabla[fekete->x][fekete->y - 1], 'b')) return 2;
+     }
 
      //ló lépések
      if (lo_van_e(tabla, feher) == 1) return 1;
@@ -759,11 +791,13 @@ int kiraly_tud_e_lepni(Mezo** tabla, Mezo* m) {
 
 //kettő mezőt megcserél
 int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char szin) {
+     printf("\n\nhonnan: %d %d %d %d babu: %c szin: %c\n", honnan->x, honnan->y, tabla[honnan->x][honnan->y].x, tabla[honnan->x][honnan->y].y, honnan->babu, honnan->szin);
+     printf("hova: %d %d %d %d babu: %c szin: %c\n\n", hova->x, hova->y, tabla[hova->x][hova->y].x, tabla[hova->x][hova->y].y, hova->babu, hova->szin);
      int ervenytelenlepes = 0, lepesellenorzo = lepes_ellenorzes(tabla, lepes, honnan, hova, szin);
-     char ideiglenes_honnan_babu = &honnan->babu, ideiglenes_honnan_szin = &honnan->szin;
+     char ideiglenes_honnan_babu = honnan->babu, ideiglenes_honnan_szin = honnan->szin;
      char ideiglenes_hova_babu = hova->babu, ideiglenes_hova_szin = hova->szin;
      
-     if (&honnan->babu == '-' || &honnan->szin != szin) return 0; //ha nem a soron lévő játkos lép akkor 0-t ad vissza
+     if (honnan->babu == '-' || honnan->szin != szin) return 0; //ha nem a soron lévő játkos lép akkor 0-t ad vissza
      if (hova->szin == szin || lepesellenorzo == 0) return 2; //ha nem szabályosan lép a játékos 2-t ad vissza
      if (hova->szin != szin && hova->szin != '-') { //ha ütés történik
           hova->babu = '-';
@@ -771,8 +805,8 @@ int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char sz
      }
 
      //mezők cserélése
-     &honnan->babu = &hova->babu;
-     &honnan->szin = &hova->szin;
+     honnan->babu = hova->babu;
+     honnan->szin = hova->szin;
      hova->babu = ideiglenes_honnan_babu;
      hova->szin = ideiglenes_honnan_szin;
 
@@ -785,22 +819,22 @@ int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char sz
      if (ervenytelenlepes) {
           hova->babu = ideiglenes_hova_babu;
           hova->szin = ideiglenes_hova_szin;
-          &honnan->babu = ideiglenes_honnan_babu;
-          &honnan->szin = ideiglenes_honnan_szin;
+          honnan->babu = ideiglenes_honnan_babu;
+          honnan->szin = ideiglenes_honnan_szin;
 
           return 2;
      }
 
      if (lepesellenorzo == 2) paraszt_cserelese(hova);
      if (lepesellenorzo == 5) {
-          if (hova->y == &honnan->y + 2) { //jobbra sáncolás
+          if (hova->y == honnan->y + 2) { //jobbra sáncolás
                if (oda_tud_e_lepni_seged(tabla, &tabla[hova->x][5], hova->szin) == 0 && oda_tud_e_lepni_seged(tabla, &tabla[hova->x][6], hova->szin) == 0) {
                     tabla[hova->x][7].babu = '-';
                     tabla[hova->x][7].szin = '-';
                     tabla[hova->x][hova->y - 1].babu = 'r';
                     tabla[hova->x][hova->y - 1].szin = hova->szin;
                }
-          } else if (hova->y == &honnan->y - 2) { //balra sáncolás
+          } else if (hova->y == honnan->y - 2) { //balra sáncolás
                if (oda_tud_e_lepni_seged(tabla, &tabla[hova->x][1], hova->szin) == 0 && oda_tud_e_lepni_seged(tabla, &tabla[hova->x][2], hova->szin) == 0 &&
                     oda_tud_e_lepni_seged(tabla, &tabla[hova->x][3], hova->szin) == 0) {
                     tabla[hova->x][0].babu = '-';
@@ -813,8 +847,8 @@ int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char sz
      
      Lepes *l;
      l = (Lepes*) malloc(sizeof(Lepes));
-     l->honnan_x = &honnan->x;
-     l->honnan_y = &honnan->y;
+     l->honnan_x = honnan->x;
+     l->honnan_y = honnan->y;
      l->hova_x = hova->x;
      l->hova_y = hova->y;
      if (ideiglenes_hova_szin != szin && ideiglenes_hova_szin != '-') {
@@ -1067,7 +1101,6 @@ void aktualis_megjelenit(Mezo** tabla, Lepes* lepes) {
           elozo_lepesek_kiir(lepes, 0);
           printf("\n\n");
      }
-     printf("\n0 1 = %c %c\n", tabla[1][0].babu, tabla[1][0].szin);
      printf("    ");
      for (int i = 0; i < 8; i++) {
           printf("%c   ", oszlopok[i]);
