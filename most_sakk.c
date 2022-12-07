@@ -236,10 +236,18 @@ int balra_le_lepes(Mezo** tabla, Mezo* jelenlegi, Mezo* hova) {
 
 //átlós lépések ellenőrzése
 int atlosan_jo_e(Mezo** tabla, Mezo* honnan, Mezo* hova) {
-     if (jobbra_fel_lepes(tabla, &tabla[honnan->x - 1][honnan->y + 1], hova)) return 1;
-     if (jobbra_le_lepes(tabla, &tabla[honnan->x + 1][honnan->y + 1], hova)) return 1;
-     if (balra_fel_lepes(tabla, &tabla[honnan->x - 1][honnan->y - 1], hova)) return 1;
-     if (balra_le_lepes(tabla, &tabla[honnan->x + 1][honnan->y - 1], hova)) return 1;
+     if (honnan->x - 1 >= 0 && honnan->y + 1 <= 7) {
+          if (jobbra_fel_lepes(tabla, &tabla[honnan->x - 1][honnan->y + 1], hova)) return 1;
+     }
+     if (honnan->x + 1 <= 7 && honnan->y + 1 <= 7) {
+          if (jobbra_le_lepes(tabla, &tabla[honnan->x + 1][honnan->y + 1], hova)) return 1;
+     }
+     if (honnan->x - 1 >= 0 && honnan->y - 1 >= 0) {
+          if (balra_fel_lepes(tabla, &tabla[honnan->x - 1][honnan->y - 1], hova)) return 1;
+     }
+     if (honnan->x + 1 <= 7 && honnan->y - 1 >= 0) {
+          if (balra_le_lepes(tabla, &tabla[honnan->x + 1][honnan->y - 1], hova)) return 1;
+     }
      
      return 0;
 }
@@ -299,10 +307,18 @@ int egyenes_balra_lepes(Mezo** tabla, Mezo *jelenlegi, Mezo *hova) {
 
 //egyenes lépések ellenőrzése
 int egyenesen_jo_e(Mezo** tabla, Mezo* honnan, Mezo* hova) {
-     if (egyenes_fel_lepes(tabla, &tabla[honnan->x - 1][honnan->y], hova)) return 1;
-     if (egyenes_le_lepes(tabla, &tabla[honnan->x + 1][honnan->y], hova)) return 1;
-     if (egyenes_jobbra_lepes(tabla, &tabla[honnan->x][honnan->y + 1], hova)) return 1;
-     if (egyenes_balra_lepes(tabla, &tabla[honnan->x][honnan->y - 1], hova)) return 1;
+     if (honnan->x - 1 >= 0) {
+          if (egyenes_fel_lepes(tabla, &tabla[honnan->x - 1][honnan->y], hova)) return 1;
+     }
+     if (honnan->x + 1 <= 7) {
+          if (egyenes_le_lepes(tabla, &tabla[honnan->x + 1][honnan->y], hova)) return 1;
+     }
+     if (honnan->y + 1 <= 7) {
+          if (egyenes_jobbra_lepes(tabla, &tabla[honnan->x][honnan->y + 1], hova)) return 1;
+     }
+     if (honnan->y - 1 <= 7) {
+          if (egyenes_balra_lepes(tabla, &tabla[honnan->x][honnan->y - 1], hova)) return 1;
+     }
      
      return 0;
 }
