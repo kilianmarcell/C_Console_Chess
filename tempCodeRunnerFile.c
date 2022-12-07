@@ -1,1 +1,1 @@
-void visszalepes(Mezo** tabla)
+l = (Lepes*) malloc(sizeof(Lepes));

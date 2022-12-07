@@ -807,8 +807,6 @@ int kiraly_tud_e_lepni(Mezo** tabla, Mezo* m) {
 
 //kettő mezőt megcserél
 int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char szin) {
-     printf("\n\nhonnan: %d %d %d %d babu: %c szin: %c\n", honnan->x, honnan->y, tabla[honnan->x][honnan->y].x, tabla[honnan->x][honnan->y].y, honnan->babu, honnan->szin);
-     printf("hova: %d %d %d %d babu: %c szin: %c\n\n", hova->x, hova->y, tabla[hova->x][hova->y].x, tabla[hova->x][hova->y].y, hova->babu, hova->szin);
      int ervenytelenlepes = 0, lepesellenorzo = lepes_ellenorzes(tabla, lepes, honnan, hova, szin);
      char ideiglenes_honnan_babu = honnan->babu, ideiglenes_honnan_szin = honnan->szin;
      char ideiglenes_hova_babu = hova->babu, ideiglenes_hova_szin = hova->szin;
@@ -861,7 +859,7 @@ int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char sz
           }
      }
      
-     Lepes *l;
+     Lepes* l;
      l = (Lepes*) malloc(sizeof(Lepes));
      l->honnan_x = honnan->x;
      l->honnan_y = honnan->y;
@@ -878,8 +876,8 @@ int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char sz
                l->leutott_szin = (hova->szin == 'w') ? 'b' : 'w';
           }
      }
+     lepes->kovetkezo = l;
      l->elozo = lepes;
-     
      lepes = l;
 
      if (sakke == 1 && szin != 'w') return 3;
@@ -977,7 +975,10 @@ void visszalepes(Mezo** tabla, Lepes* lepes) {
 //betölt egy sakktáblát, innen kezdődik a játék
 void uj_jatek() {
      Mezo** tabla = tabla_betolt();
-     Lepes* lepes = NULL;
+     Lepes* lepes;
+     lepes = (Lepes*) malloc(sizeof(Lepes));
+     lepes->honnan_x = 2;
+     printf("honnanx: %d\n", lepes->honnan_x);
      if (egy_lepes(tabla, lepes, "-", 0) == 1) {
           menu();
      }
@@ -1010,6 +1011,7 @@ int egy_lepes(Mezo** tabla, Lepes* lepes, char* betolt_e, int betolt_vege) {
      }
 
      while(muvelet != 9) {
+          if (lepes != NULL) printf("lepesek: %d\n", lepes->honnan_x);
           if (sakk_e == 1) {
                if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla, lepes);
                printf("Sakk!\n");
