@@ -1092,7 +1092,6 @@ int egy_lepes(Mezo** tabla, Lepes* lepes, char* betolt_e, int betolt_vege) {
           scanf("%c", &valasz);
           if (valasz == 'i') {
                jatek_mentese(lepes);
-               return 0;
           }
      }
      
@@ -1207,12 +1206,13 @@ Mezo** tabla_betolt() {
 //helyes sorrendben menti el a lépéseket
 void fajlbair(FILE* mentes, Lepes* lepes) {
      if (lepes->elozo != NULL) fajlbair(mentes, lepes->elozo);
-
-     fputc(lepes->honnan_x + '0', mentes);
-     fputc(lepes->honnan_y + '0', mentes);
-     fputc(lepes->hova_x + '0', mentes);
-     fputc(lepes->hova_y + '0', mentes);
-     fputc('\n', mentes);
+     if (lepes->honnan_x != -1) {
+          fputc(lepes->honnan_x + '0', mentes);
+          fputc(lepes->honnan_y + '0', mentes);
+          fputc(lepes->hova_x + '0', mentes);
+          fputc(lepes->hova_y + '0', mentes);
+          fputc('\n', mentes);
+     }
 }
 
 //menti az aktuális játékot
@@ -1250,6 +1250,10 @@ void jatek_betolt() {
 
      Mezo** tabla = tabla_betolt();
      Lepes* lepes;
+     lepes = (Lepes*) malloc(sizeof(Lepes));
+     lepes->honnan_x = -1;
+     lepes->elozo = NULL;
+     lepes->kovetkezo = NULL;
 
      fseek(jatszma, 0, SEEK_END);
      int length = ftell(jatszma);
@@ -1288,6 +1292,7 @@ void jatek_betolt() {
                menu();
                return;
           }
+          lepes = lepes->kovetkezo;
      }
      free(beolvasott);
      fclose(jatszma);
