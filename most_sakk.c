@@ -591,6 +591,7 @@ int sakk_ellenoriz(Mezo** tabla) {
      return 0;
 }
 
+//ellenõrzi, hogy a bemenetként érkezõ bábu ha király lenne, sakk lenne e
 int oda_tud_e_lepni_seged(Mezo** tabla, Mezo* m, char szin) {
      if (jobbra_fel_ellenoriz(tabla, &tabla[m->x - 1][m->y + 1], szin)) return 1;
      if (jobbra_le_ellenoriz(tabla, &tabla[m->x + 1][m->y + 1], szin)) return 1;
@@ -750,7 +751,7 @@ int lepes_ellenorzes(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char 
 void paraszt_cserelese(Mezo* m) {
      char melyik = 'a';
      printf("\nMilyen bábura váltasz? (q = királynő, r = bástya, b = futó, h = ló) ");
-     scanf("%c", &melyik);
+     getchar();
      scanf("%c", &melyik);
      switch (melyik) {
      case 'q':
@@ -768,6 +769,7 @@ void paraszt_cserelese(Mezo* m) {
      }
 }
 
+//ellenőrzi, hogy a király tud-e az m mezőre lépni
 int kiraly_tud_e_lepni(Mezo** tabla, Mezo* m) {
      if (tablan_belul_van_e(m->x - 1, m->y)) {
           if (tabla[m->x - 1][m->y].szin != m->szin &&
@@ -1115,7 +1117,7 @@ int egy_lepes(Mezo** tabla, Lepes* lepes, char* betolt_e, int betolt_vege) {
 void aktualis_megjelenit(Mezo** tabla, Lepes* lepes) {
      //a sakktábla oszlopait tárolja a karaktertömb
      char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
-     // system("cls");
+     system("cls");
      if (lepesek_megszamolasa(lepes, -1) > 0) {
           printf("Utolsó 5 lépés:   ");
           elozo_lepesek_kiir(lepes, 0);
@@ -1342,6 +1344,7 @@ void hibauzenet(char *uzenet) {
 //amikor betölt a program ez a metódus fut le először, ez a metódus a menüt jelenti, itt dönti el a felhasználó,
 //hogy mit szeretne a programon belül csinálni, ez a metódus a felhasználó által választott metódust hívja meg
 void menu() {
+     system("cls");
      int beolvas;
      printf("- Sakk -\n\n1. Uj jatek\n2. Jatek betoltese\n3. Hasznalati utmutato\n\n9. Kilepes\n\n");
      printf("Valasztas: ");
