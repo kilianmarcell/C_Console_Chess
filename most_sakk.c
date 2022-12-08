@@ -805,93 +805,12 @@ int kiraly_tud_e_lepni(Mezo** tabla, Mezo* m) {
      return 0;
 }
 
-//kettő mezőt megcserél
-int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char szin) {
-     int ervenytelenlepes = 0, lepesellenorzo = lepes_ellenorzes(tabla, lepes, honnan, hova, szin);
-     char ideiglenes_honnan_babu = honnan->babu, ideiglenes_honnan_szin = honnan->szin;
-     char ideiglenes_hova_babu = hova->babu, ideiglenes_hova_szin = hova->szin;
-     
-     if (honnan->babu == '-' || honnan->szin != szin) return 0; //ha nem a soron lévő játkos lép akkor 0-t ad vissza
-     if (hova->szin == szin || lepesellenorzo == 0) return 2; //ha nem szabályosan lép a játékos 2-t ad vissza
-     if (hova->szin != szin && hova->szin != '-') { //ha ütés történik
-          hova->babu = '-';
-          hova->szin = '-';
-     }
-
-     //mezők cserélése
-     honnan->babu = hova->babu;
-     honnan->szin = hova->szin;
-     hova->babu = ideiglenes_honnan_babu;
-     hova->szin = ideiglenes_honnan_szin;
-
-     //sakk ellenőrzése
-     int sakke = sakk_ellenoriz(tabla);
-     
-     if (sakke == 1 && szin == 'w') ervenytelenlepes = 1;
-     else if (sakke == 2 && szin == 'b') ervenytelenlepes = 1;
-
-     if (ervenytelenlepes) {
-          hova->babu = ideiglenes_hova_babu;
-          hova->szin = ideiglenes_hova_szin;
-          honnan->babu = ideiglenes_honnan_babu;
-          honnan->szin = ideiglenes_honnan_szin;
-
-          return 2;
-     }
-
-     if (lepesellenorzo == 2) paraszt_cserelese(hova);
-     if (lepesellenorzo == 5) {
-          if (hova->y == honnan->y + 2) { //jobbra sáncolás
-               if (oda_tud_e_lepni_seged(tabla, &tabla[hova->x][5], hova->szin) == 0 && oda_tud_e_lepni_seged(tabla, &tabla[hova->x][6], hova->szin) == 0) {
-                    tabla[hova->x][7].babu = '-';
-                    tabla[hova->x][7].szin = '-';
-                    tabla[hova->x][hova->y - 1].babu = 'r';
-                    tabla[hova->x][hova->y - 1].szin = hova->szin;
-               }
-          } else if (hova->y == honnan->y - 2) { //balra sáncolás
-               if (oda_tud_e_lepni_seged(tabla, &tabla[hova->x][1], hova->szin) == 0 && oda_tud_e_lepni_seged(tabla, &tabla[hova->x][2], hova->szin) == 0 &&
-                    oda_tud_e_lepni_seged(tabla, &tabla[hova->x][3], hova->szin) == 0) {
-                    tabla[hova->x][0].babu = '-';
-                    tabla[hova->x][0].szin = '-';
-                    tabla[hova->x][hova->y + 1].babu = 'r';
-                    tabla[hova->x][hova->y + 1].szin = hova->szin;
-               }
-          }
-     }
-     
-     Lepes* l;
-     l = (Lepes*) malloc(sizeof(Lepes));
-     l->honnan_x = honnan->x;
-     l->honnan_y = honnan->y;
-     l->hova_x = hova->x;
-     l->hova_y = hova->y;
-     if (ideiglenes_hova_szin != szin && ideiglenes_hova_szin != '-') {
-          l->leutott_babu = ideiglenes_hova_babu;
-          l->leutott_szin = ideiglenes_hova_szin;
-     } else {
-          l->leutott_babu = '-';
-          l->leutott_szin = '-';
-          if (lepesellenorzo == 4)  {
-               l->leutott_babu = 'p';
-               l->leutott_szin = (hova->szin == 'w') ? 'b' : 'w';
-          }
-     }
-     lepes->kovetkezo = l;
-     l->elozo = lepes;
-     lepes = l;
-
-     if (sakke == 1 && szin != 'w') return 3;
-     else if (sakke == 2 && szin != 'b') return 3;
-
-     return 1;
-}
-
 void elozo_lepesek_kiir(Lepes* l, int szamol) {
      //a sakktábla oszlopait tárolja a karaktertömb
      char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
      if (szamol < 5 && l != NULL) {
-          elozo_lepesek_kiir(l->elozo, szamol + 1);
-          printf("%c%d->%c%d   ", oszlopok[l->honnan_y], 8 - l->honnan_x, oszlopok[l->hova_y], 8 - l->hova_x);
+          if (l->elozo != NULL) elozo_lepesek_kiir(l->elozo, szamol + 1);
+          if (l->honnan_x != -1) printf("%c%d->%c%d   ", oszlopok[l->honnan_y], 8 - l->honnan_x, oszlopok[l->hova_y], 8 - l->hova_x);
      }
 }
 
@@ -972,16 +891,96 @@ void visszalepes(Mezo** tabla, Lepes* lepes) {
      aktualis_megjelenit(tabla, lepes);
 }
 
+//kettő mezőt megcserél
+int pozicio_cserel(Mezo** tabla, Lepes* lepes, Mezo* honnan, Mezo* hova, char szin) {
+     int ervenytelenlepes = 0, lepesellenorzo = lepes_ellenorzes(tabla, lepes, honnan, hova, szin);
+     char ideiglenes_honnan_babu = honnan->babu, ideiglenes_honnan_szin = honnan->szin;
+     char ideiglenes_hova_babu = hova->babu, ideiglenes_hova_szin = hova->szin;
+     
+     if (honnan->babu == '-' || honnan->szin != szin) return 0; //ha nem a soron lévő játkos lép akkor 0-t ad vissza
+     if (hova->szin == szin || lepesellenorzo == 0) return 2; //ha nem szabályosan lép a játékos 2-t ad vissza
+     if (hova->szin != szin && hova->szin != '-') { //ha ütés történik
+          hova->babu = '-';
+          hova->szin = '-';
+     }
+
+     //mezők cserélése
+     honnan->babu = hova->babu;
+     honnan->szin = hova->szin;
+     hova->babu = ideiglenes_honnan_babu;
+     hova->szin = ideiglenes_honnan_szin;
+
+     //sakk ellenőrzése
+     int sakke = sakk_ellenoriz(tabla);
+     
+     if (sakke == 1 && szin == 'w') ervenytelenlepes = 1;
+     else if (sakke == 2 && szin == 'b') ervenytelenlepes = 1;
+
+     if (ervenytelenlepes) {
+          hova->babu = ideiglenes_hova_babu;
+          hova->szin = ideiglenes_hova_szin;
+          honnan->babu = ideiglenes_honnan_babu;
+          honnan->szin = ideiglenes_honnan_szin;
+
+          return 2;
+     }
+
+     if (lepesellenorzo == 2) paraszt_cserelese(hova);
+     if (lepesellenorzo == 5) {
+          if (hova->y == honnan->y + 2) { //jobbra sáncolás
+               if (oda_tud_e_lepni_seged(tabla, &tabla[hova->x][5], hova->szin) == 0 && oda_tud_e_lepni_seged(tabla, &tabla[hova->x][6], hova->szin) == 0) {
+                    tabla[hova->x][7].babu = '-';
+                    tabla[hova->x][7].szin = '-';
+                    tabla[hova->x][hova->y - 1].babu = 'r';
+                    tabla[hova->x][hova->y - 1].szin = hova->szin;
+               }
+          } else if (hova->y == honnan->y - 2) { //balra sáncolás
+               if (oda_tud_e_lepni_seged(tabla, &tabla[hova->x][1], hova->szin) == 0 && oda_tud_e_lepni_seged(tabla, &tabla[hova->x][2], hova->szin) == 0 &&
+                    oda_tud_e_lepni_seged(tabla, &tabla[hova->x][3], hova->szin) == 0) {
+                    tabla[hova->x][0].babu = '-';
+                    tabla[hova->x][0].szin = '-';
+                    tabla[hova->x][hova->y + 1].babu = 'r';
+                    tabla[hova->x][hova->y + 1].szin = hova->szin;
+               }
+          }
+     }
+     
+     Lepes* l;
+     l = (Lepes*) malloc(sizeof(Lepes));
+     l->honnan_x = honnan->x;
+     l->honnan_y = honnan->y;
+     l->hova_x = hova->x;
+     l->hova_y = hova->y;
+     if (ideiglenes_hova_szin != szin && ideiglenes_hova_szin != '-') {
+          l->leutott_babu = ideiglenes_hova_babu;
+          l->leutott_szin = ideiglenes_hova_szin;
+     } else {
+          l->leutott_babu = '-';
+          l->leutott_szin = '-';
+          if (lepesellenorzo == 4)  {
+               l->leutott_babu = 'p';
+               l->leutott_szin = (hova->szin == 'w') ? 'b' : 'w';
+          }
+     }
+
+     l->elozo = lepes;
+     lepes->kovetkezo = l;
+
+     if (sakke == 1 && szin != 'w') return 3;
+     else if (sakke == 2 && szin != 'b') return 3;
+
+     return 1;
+}
+
 //betölt egy sakktáblát, innen kezdődik a játék
 void uj_jatek() {
      Mezo** tabla = tabla_betolt();
      Lepes* lepes;
      lepes = (Lepes*) malloc(sizeof(Lepes));
-     lepes->honnan_x = 2;
-     printf("honnanx: %d\n", lepes->honnan_x);
-     if (egy_lepes(tabla, lepes, "-", 0) == 1) {
-          menu();
-     }
+     lepes->honnan_x = -1;
+     lepes->elozo = NULL;
+     lepes->kovetkezo = NULL;
+     if (egy_lepes(tabla, lepes, "-", 0) == 1) menu();
 }
 
 //megszámolja és visszaadja az eddigi lépések számát
@@ -1001,17 +1000,18 @@ int egy_lepes(Mezo** tabla, Lepes* lepes, char* betolt_e, int betolt_vege) {
      if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla, lepes);
 
      if (betolt_vege == 1) {
-          if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
+          if (lepesek_megszamolasa(lepes, -1) % 2 == 1) jatekos = 'b';
           if (sakk_ellenoriz(tabla) != 0) sakk_e = 1;
      }
 
      if (strcmp(betolt_e, "-") == 1) {
           strcpy(bemenet, betolt_e);
-          if (lepesek_megszamolasa(lepes, 0) % 2 == 1) jatekos = 'b';
+          if (lepesek_megszamolasa(lepes, -1) % 2 == 1) jatekos = 'b';
      }
 
      while(muvelet != 9) {
-          if (lepes != NULL) printf("lepesek: %d\n", lepes->honnan_x);
+          // printf("\npointer: %d\n", lepes);
+          // if (lepes != NULL) printf("honnan_x: %d\n", lepes->honnan_x);
           if (sakk_e == 1) {
                if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla, lepes);
                printf("Sakk!\n");
@@ -1040,6 +1040,7 @@ int egy_lepes(Mezo** tabla, Lepes* lepes, char* betolt_e, int betolt_vege) {
                     } else if (ellenoriz == 1) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
+                         lepes = lepes->kovetkezo;
                          if (strcmp(betolt_e, "-") == 0) aktualis_megjelenit(tabla, lepes);
                     } else if (ellenoriz == 3) {
                          if (jatekos == 'w') jatekos = 'b';
@@ -1114,7 +1115,7 @@ void aktualis_megjelenit(Mezo** tabla, Lepes* lepes) {
      //a sakktábla oszlopait tárolja a karaktertömb
      char oszlopok[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
      // system("cls");
-     if (lepesek_megszamolasa(lepes, 0) > 0) {
+     if (lepesek_megszamolasa(lepes, -1) > 0) {
           printf("Utolsó 5 lépés:   ");
           elozo_lepesek_kiir(lepes, 0);
           printf("\n\n");
