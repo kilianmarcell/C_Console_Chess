@@ -8,8 +8,4 @@ typedef struct {
      char szin;
 } Mezo;
 
-extern Mezo tabla[8][8];
-extern Mezo* feher_kiraly;
-extern Mezo* fekete_kiraly;
-
 #endif
