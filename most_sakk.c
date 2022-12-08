@@ -887,8 +887,7 @@ void visszalepes(Mezo** tabla, Lepes* lepes) {
 
      Lepes* seged = lepes->elozo;
      free(lepes);
-     lepes = seged;
-     aktualis_megjelenit(tabla, lepes);
+     aktualis_megjelenit(tabla, seged);
 }
 
 //kettő mezőt megcserél
@@ -1046,6 +1045,7 @@ int egy_lepes(Mezo** tabla, Lepes* lepes, char* betolt_e, int betolt_vege) {
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
                          sakk_e = 1;
+                         lepes = lepes->kovetkezo;
                     } else if (ellenoriz == 4) {
                          printf("\nSakk matt!\n");
                          (jatekos == 'w') ? printf("Fehér játékos nyert!") : printf("Fekete játékos nyert");
@@ -1058,8 +1058,10 @@ int egy_lepes(Mezo** tabla, Lepes* lepes, char* betolt_e, int betolt_vege) {
           } else if (sscanf(bemenet, "%d", &muvelet) == 1) {
                if (strcmp(betolt_e, "-") == 1) return 0;
                if (muvelet == 2) {
-                    if (lepes != NULL) {
+                    if (lepes != NULL && lepes->honnan_x != -1) {
+                         Lepes* seged = lepes->elozo;
                          visszalepes(tabla, lepes);
+                         lepes = seged;
 
                          if (jatekos == 'w') jatekos = 'b';
                          else jatekos = 'w';
