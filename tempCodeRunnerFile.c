@@ -1,1 +1,0 @@
-l = (Lepes*) malloc(sizeof(Lepes));

@@ -256,3 +256,40 @@
 	"mezo.h"
 	"babu_lepesek.h"
 
+1679644068 source:d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\main.c
+	<stdio.h>
+	<stdlib.h>
+	"mezo.h"
+	"lepes.h"
+	"konvertalasok.h"
+	"babu_lepesek.h"
+	"sakk_ellenorzo.h"
+	"lepes_ellenorzo.h"
+	"menu.h"
+	"debugmalloc.h"
+
+1679644068 d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\mezo.h
+
+1679644068 d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\lepes.h
+
+1679644068 d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\konvertalasok.h
+
+1679644068 d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\babu_lepesek.h
+
+1679644068 d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\sakk_ellenorzo.h
+
+1679644068 d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\lepes_ellenorzo.h
+
+1679644068 d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\menu.h
+
+1679644068 d:\progi\c\c_sakk\a sakk külön komponensekre osztva + code blocks\debugmalloc.h
+	<stdbool.h>
+	<stddef.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<string.h>
+	<stdarg.h>
+	<process.h>
+	<unistd.h>
+
