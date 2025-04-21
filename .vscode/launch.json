@@ -1,0 +1,45 @@
+{
+    "configurations": [
+        {
+            "name": "English Chess",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/chess_english.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build English Chess"
+        },
+        {
+            "name": "Hungarian Chess",
+            "type": "cppdbg", 
+            "request": "launch",
+            "program": "${workspaceFolder}/chess_hungarian.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Hungarian Chess"
+        }
+    ],
+    "version": "2.0.0"
+}
