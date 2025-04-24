@@ -1,0 +1,65 @@
+// Test file for pawn promotion
+// This file tests promotion of pawns when they reach the opposite end of the board
+
+// Setting up a scenario where a pawn can be promoted
+// We'll create a direct path for a pawn to quickly reach promotion
+
+// Move 1: White pawn from e2 to e4
+e2 e4
+
+// Move 1: Black pawn from d7 to d5
+d7 d5
+
+// Move 2: White pawn from e4 captures black pawn on d5
+e4 d5
+
+// Move 2: Black knight from b8 to c6
+b8 c6
+
+// Move 3: White pawn from d5 to d6
+d5 d6
+
+// Move 3: Black knight from g8 to f6
+g8 f6
+
+// Move 4: White pawn from d6 to d7
+d6 d7
+
+// Move 4: Black bishop from c8 to e6
+c8 e6
+
+// Move 5: White pawn from d7 captures on e8, promoting to a queen
+d7 e8
+
+// Expected result: White pawn should be promoted to a queen on e8
+
+// Now let's test another promotion scenario, but from Black's perspective
+
+// Move 5: Black pawn from c7 to c5
+c7 c5
+
+// Move 6: White bishop from f1 to b5
+f1 b5
+
+// Move 6: Black pawn from c5 to c4
+c5 c4
+
+// Move 7: White bishop from b5 to a4
+b5 a4
+
+// Move 7: Black pawn from c4 to c3
+c4 c3
+
+// Move 8: White pawn from b2 to b4
+b2 b4
+
+// Move 8: Black pawn from c3 captures on b2
+c3 b2
+
+// Move 9: White knight from g1 to f3
+g1 f3
+
+// Move 9: Black pawn from b2 to b1, promoting to a queen
+b2 b1
+
+// Expected result: Black pawn should be promoted to a queen on b1

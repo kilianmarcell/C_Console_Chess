@@ -16,7 +16,6 @@
 #include "memory_utils.h"
 
 // Function declarations for helper functions
-static int process_move_input(char* input, char player);
 static void switch_player(char* player);
 static void handle_check_state(char* load_move, int* is_check);
 static void display_player_prompt(char player);
@@ -146,10 +145,10 @@ int make_move(char* load_move, int load_complete) {
 /**
  * Processes a move input and makes the move if valid
  */
-static int process_move_input(char* input, char player) {
+int process_move_input(char* input, char player) {
     char from_col, to_col;
     int from_row, to_row, validate;
-      // Make input lowercase to handle both uppercase and lowercase letters
+    // Make input lowercase to handle both uppercase and lowercase letters
     for (int i = 0; input[i]; i++) {
         if (input[i] >= 'A' && input[i] <= 'Z') {
             input[i] = input[i] - 'A' + 'a';

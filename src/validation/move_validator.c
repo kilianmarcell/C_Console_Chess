@@ -50,12 +50,28 @@ int validate_move(Square* from, Square* to, char color) {
                          return 1;
                     }
                } 
-               // Capture move
+               // Regular capture move
                else if ((from->y == to->y - 1 || from->y == to->y + 1) && 
                       from->x - 1 == to->x && to->color == BLACK) {
                     if (to->x == 0) {
                          return 2; // Pawn reached the opponent's back rank (promotion)
                     }
+                    return 1;
+               }
+               // En passant capture (for White)
+               else if (from->x == 3 && to->x == 2 && 
+                       (from->y == to->y - 1 || from->y == to->y + 1) &&
+                       to->piece == '-' && 
+                       current_move != NULL && 
+                       current_move->to_x == 3 && 
+                       current_move->from_x == 1 &&
+                       current_move->to_y == to->y &&
+                       board[3][to->y].piece == PIECE_LETTERS[PAWN] &&
+                       board[3][to->y].color == BLACK) {
+                    printf("Debug: En passant capture by white detected!\n");
+                    // Remove the captured pawn
+                    board[3][to->y].piece = '-';
+                    board[3][to->y].color = '-';
                     return 1;
                }
           }
@@ -74,12 +90,28 @@ int validate_move(Square* from, Square* to, char color) {
                          return 1;
                     }
                } 
-               // Capture move
+               // Regular capture move
                else if ((from->y == to->y - 1 || from->y == to->y + 1) && 
                       from->x + 1 == to->x && to->color == WHITE) {
                     if (to->x == 7) {
                          return 2; // Pawn reached the opponent's back rank (promotion)
                     }
+                    return 1;
+               }
+               // En passant capture (for Black)
+               else if (from->x == 4 && to->x == 5 && 
+                       (from->y == to->y - 1 || from->y == to->y + 1) &&
+                       to->piece == '-' &&
+                       current_move != NULL && 
+                       current_move->to_x == 4 && 
+                       current_move->from_x == 6 &&
+                       current_move->to_y == to->y &&
+                       board[4][to->y].piece == PIECE_LETTERS[PAWN] &&
+                       board[4][to->y].color == WHITE) {
+                    printf("Debug: En passant capture by black detected!\n");
+                    // Remove the captured pawn
+                    board[4][to->y].piece = '-';
+                    board[4][to->y].color = '-';
                     return 1;
                }
           }
